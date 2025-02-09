@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="hc_data_menu_accountant" name="Kế toán" sequence="5"/>
+        <record id="hc_trip_view_accountant_action" model="ir.actions.act_window">
+            <field name="name">Hạch toán</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_group_by_dealer": 1, 'create':0,'delete':0}</field>
+        </record>
+        <menuitem id="hc_trip_view_accountant_menu" name="Hạch toán" parent="hc_data_menu_accountant" action="hc_trip_view_accountant_action" sequence="1"/>
+        <record id="hc_dealer_report_action" model="ir.actions.act_window">
+            <field name="name">Báo cáo đại lý</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="advanced_emxe.hc_trip_view_tree3"/>
+            <field name="context">{"search_default_group_by_dealer": 1, 'create':0, 'edit':0,'delete':0}</field>
+        </record>
+        <record id="hc_internal_vehicle_report_action" model="ir.actions.act_window">
+            <field name="name">Báo cáo xe nội bộ</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('transport_vendor_id','=',1)]</field>
+            <field name="view_id" ref="advanced_emxe.hc_trip_view_tree2"/>
+            <field name="context">{'search_default_group_by_vehicle': 1,'create':0, 'edit':0,'delete':0}</field>
+        </record>
+        <record id="hc_other_vehicle_report_action" model="ir.actions.act_window">
+            <field name="name">Báo cáo xe vệ tinh</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('transport_vendor_id','!=',1)]</field>
+            <field name="view_id" ref="advanced_emxe.hc_trip_view_tree3"/>
+            <field name="context">{'search_default_group_by_transport_vendor': 1,'create':0, 'edit':0,'delete':0}</field>
+        </record>
+        <record id="hc_driver_salary_report_action" model="ir.actions.act_window">
+            <field name="name">Báo cáo lương của lái xe</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="advanced_emxe.hc_trip_view_tree4"/>
+            <field name="context">{'search_default_group_by_driver': 1,'search_default_hc_trip': 1'create':0, 'edit':0,'delete':0}</field>
+        </record>
+        <menuitem id="hc_view_report_menu" name="Báo cáo" parent="hc_data_menu_accountant" sequence="10"/>
+        <menuitem id="hc_internal_vehicle_report_menu" name="Báo cáo xe nội bộ" parent="hc_view_report_menu" action="hc_internal_vehicle_report_action" sequence="1"/>
+        <menuitem id="hc_other_vehicle_report_menu" name="Báo cáo xe vệ tinh" parent="hc_view_report_menu" action="hc_other_vehicle_report_action" sequence="5"/>
+        <menuitem id="hc_dealer_report_menu" name="Báo cáo đại lý" parent="hc_view_report_menu" action="hc_dealer_report_action" sequence="10"/>
+        <menuitem id="hc_driver_salary_report_menu" name="Báo cáo lương của lái xe" parent="hc_view_report_menu" action="hc_driver_salary_report_action" sequence="15"/>
+        <menuitem id="hc_accountant_config_menu" name="Cấu hình" parent="hc_data_menu_accountant" sequence="50"/>
+        <record id="hc_trip_cost_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.cost.view.tree</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_cost_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.cost.view.form</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="type_id"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_cost_view_action" model="ir.actions.act_window">
+            <field name="name">Các khoản chi</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.entry.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('entry_type', '=', 'cost')]</field>
+            <field name="context">{'default_entry_type': 'cost'}</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('hc_trip_cost_view_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('hc_trip_cost_view_form')}),
+                         ]"/>
+        </record>
+        <menuitem id="hc_trip_cost_view_menu" name="Các khoản chi" parent="hc_accountant_config_menu" action="hc_trip_cost_view_action" sequence="3"/>
+        <record id="hc_trip_income_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.income.view.tree</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_income_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.income.view.form</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="vat"/>
+                            <field name="note"/>
+                            <field name="is_freight_cost"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_income_view_action" model="ir.actions.act_window">
+            <field name="name">Các khoản thu</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.entry.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('entry_type', '=', 'income')]</field>
+            <field name="context">{'default_entry_type': 'income'}</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('hc_trip_income_view_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('hc_trip_income_view_form')}),
+                         ]"/>
+        </record>
+        <menuitem id="hc_trip_income_view_menu" name="Các khoản thu" parent="hc_accountant_config_menu" action="hc_trip_income_view_action" sequence="10"/>
+        <record id="hc_operation_cost_view_tree" model="ir.ui.view">
+            <field name="name">hc.operation.cost.view.tree</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_operation_cost_view_form" model="ir.ui.view">
+            <field name="name">hc.operation.cost.view.form</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_operation_cost_action" model="ir.actions.act_window">
+            <field name="name">Chi phí vận hành nội bộ</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.entry.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('entry_type', '=', 'operation_cost')]</field>
+            <field name="context">{'default_entry_type': 'operation_cost'}</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('hc_operation_cost_view_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('hc_operation_cost_view_form')}),
+                         ]"/>
+        </record>
+        <menuitem id="hc_operation_cost_view_menu" name="Chi phí vận hành nội bộ" parent="hc_accountant_config_menu" action="hc_operation_cost_action" sequence="15"/>
+        <record id="hc_trip_paid_cost_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.paid.cost.view.tree</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_paid_cost_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.paid.cost.view.form</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_paid_cost_action" model="ir.actions.act_window">
+            <field name="name">Các khoản đã chi</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.entry.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('entry_type', '=', 'paid_cost')]</field>
+            <field name="context">{'default_entry_type': 'paid_cost'}</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('hc_trip_paid_cost_view_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('hc_trip_paid_cost_view_form')}),
+                         ]"/>
+        </record>
+        <menuitem id="hc_trip_paid_cost_menu" name="Các khoản đã chi" parent="hc_accountant_config_menu" action="hc_trip_paid_cost_action" sequence="4"/>
+        <record id="hc_trip_payment_income_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.payment.income.view.tree</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_payment_income_view_form" model="ir.ui.view">
+            <field name="name">hc_trip_payment_income_view_form</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_payment_income_action" model="ir.actions.act_window">
+            <field name="name">Các khoản đã thu</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.entry.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('entry_type', '=', 'payment_income')]</field>
+            <field name="context">{'default_entry_type': 'payment_income'}</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('hc_trip_payment_income_view_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('hc_trip_payment_income_view_form')}),
+                         ]"/>
+        </record>
+        <menuitem id="hc_trip_payment_income_menu" name="Các khoản đã thu" parent="hc_accountant_config_menu" action="hc_trip_payment_income_action" sequence="11"/>
+        <record id="hc_driver_cost_view_tree" model="ir.ui.view">
+            <field name="name">hc.driver.cost.view.tree</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_driver_cost_view_form" model="ir.ui.view">
+            <field name="name">hc.driver.cost.view.form</field>
+            <field name="model">hc.trip.entry.config</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_driver_cost_action" model="ir.actions.act_window">
+            <field name="name">Các khoản lái xe đã chi</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.entry.config</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('entry_type', '=', 'driver_cost')]</field>
+            <field name="context">{'default_entry_type': 'driver_cost'}</field>
+            <field name="view_ids"
+                   eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('hc_driver_cost_view_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('hc_driver_cost_view_form')}),
+                         ]"/>
+        </record>
+        <menuitem id="hc_driver_cost_menu" name="Các khoản lái xe đã chi" parent="hc_accountant_config_menu" action="hc_driver_cost_action" sequence="15"/>
+        <record id="hc_executive_report_action" model="ir.actions.act_window">
+            <field name="name">Báo cáo điều hành chuyến xe</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', '!=', 'draft')]</field>
+            <field name="view_id" ref="advanced_emxe.hc_trip_view_tree3"/>
+            <field name="context">{"search_default_group_by_operator": 1, 'create':0, 'edit':1,'delete':0}</field>
+        </record>
+        <menuitem id="hc_executive_report_menu" name="Báo cáo điều hành chuyến xe" parent="hc_view_report_menu" action="hc_executive_report_action" sequence="15"/>
+        <record id="hc_accounting_report_action" model="ir.actions.act_window">
+            <field name="name">Báo cáo hạch toán chuyến xe theo kế toán</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('state', 'in', ['done', 'payment'])]</field>
+            <field name="view_id" ref="advanced_emxe.hc_trip_view_tree3"/>
+            <field name="context">{"search_default_group_by_accountant": 1, 'create':0, 'edit':1,'delete':0}</field>
+        </record>
+        <menuitem id="hc_accounting_report_menu" name="Báo cáo hạch toán chuyến xe theo kế toán" parent="hc_view_report_menu" action="hc_accounting_report_action" sequence="20"/>
+    </data>
+</odoo>

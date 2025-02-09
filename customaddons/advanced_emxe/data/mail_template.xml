@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="hc_mail_send_otp" model="mail.template">
+            <field name="name">HC: Gửi OTP</field>
+            <field name="model_id" ref="model_hc_otp"/>
+            <field name="subject">Hoàng Châu: Mã OTP</field>
+            <field name="body_html" type="html">
+                <p>Kính gửi quý khách</p>
+                <p>Mã OTP đặt lại mật khẩu: <span t-out="object.otp"/></p>
+                <p>Vui lòng không chia sẻ cho bất kỳ ai.</p>
+                <p>Trân trọng cảm ơn!</p>
+            </field>
+        </record>
+        <record id="hc_mail_template_create_trip" model="mail.template">
+            <field name="name">HC: Gửi mail tạo chuyến xe</field>
+            <field name="model_id" ref="model_hc_trip"/>
+            <field name="subject">Hoàng Châu: Xác nhận thông tin chuyến đi</field>
+            <field name="body_html" type="html">
+                <p>Kính gửi quý khách
+                    <t t-out="object.dealer_id.name "/>
+                </p>
+                <p>Thông tin chuyến đi của bạn được hệ thống ghi nhận như sau:</p>
+                <table style="border-collapse: collapse;width: 80%;">
+                    <tr>
+                        <td style="border: solid 1px black;padding: 5px;font-weight: bold;width: 40%;">Điểm đi</td>
+                        <td style="border: solid 1px black;padding: 5px;">
+                            <t t-out="object.series_id.trip_stage_ids[0].pick_up_place"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: solid 1px black;padding: 5px;font-weight: bold;width: 40%;">Điểm đến</td>
+                        <td style="border: solid 1px black;padding: 5px;">
+                            <t t-out="object.series_id.trip_stage_ids[-1].destination"/>
+                        </td>
+                    </tr>
+                </table>
+                <p>Trân trọng cảm ơn!</p>
+            </field>
+        </record>
+        <record id="hc_mail_template_confirm_trip" model="mail.template">
+            <field name="name">HC: Gửi mail xác nhận chuyến xe</field>
+            <field name="model_id" ref="model_hc_trip"/>
+            <field name="subject">Hoàng Châu: Đặt chuyến thành công</field>
+            <field name="body_html" type="html">
+                <p>Kính gửi quý khách
+                    <t t-out="object.dealer_id.name "/>
+                </p>
+                <p>Qúy khách đã đặt chuyến thành công. Hoàng Châu xin gửi lại thông tin liên hệ như sau:</p>
+                <table style="border-collapse: collapse;width: 80%;">
+                    <tr>
+                        <td style="border: solid 1px black;padding: 5px;font-weight: bold;width: 40%;">Xe</td>
+                        <td style="border: solid 1px black;padding: 5px;">
+                            <t t-out="object.vehicle_id.license_plate"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: solid 1px black;padding: 5px;font-weight: bold;width: 40%;">Loại xe</td>
+                        <td style="border: solid 1px black;padding: 5px;">
+                            <t t-out="object.vehicle_type_id.name"/>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="border: solid 1px black;padding: 5px;font-weight: bold;width: 40%;">Lái xe</td>
+                        <td style="border: solid 1px black;padding: 5px;">
+                            <t t-out="object.vehicle_id.driver_id.name"/>
+                        </td>
+                    </tr>
+                </table>
+                <p>Trân trọng cảm ơn!</p>
+            </field>
+        </record>
+    </data>
+</odoo>

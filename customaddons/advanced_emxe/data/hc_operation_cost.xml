@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="hc_operation_cost_oil" model="hc.operation.cost">
+            <field name="name">Dầu</field>
+        </record>
+    </data>
+</odoo>

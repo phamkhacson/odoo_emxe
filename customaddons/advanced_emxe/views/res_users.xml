@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="hc_view_users_form_inherit" model="ir.ui.view">
+            <field name="name">hc.view.users.form.inherit</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='preferences']//group[1]/group[2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//page[@name='preferences']//group[2]" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='signature']" position="attributes">
+                    <attribute name="invisible">1</attribute>
+                </xpath>
+                <xpath expr="//page[@name='access_rights']" position="before">
+                    <page name="hc_information" string="Thông tin">
+                        <group>
+                            <field name="identification_number"/>
+                            <field name="phone" string="Điện thoại"/>
+                            <field name="position"/>
+                            <field name="emxe_gender" required="1"/>
+                            <field name="dealer_id"/>
+                            <field name="vehicle_id"/>
+                            <field name="transport_vendor_id"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

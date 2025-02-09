@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="emxe_flutter_log_form_view" model="ir.ui.view">
+            <field name="name">emxe_flutter_log_view</field>
+            <field name="model">emxe.flutter.log</field>
+            <field name="arch" type="xml">
+                <form string="ModelTitle">
+                    <sheet>
+                        <group>
+                            <group>
+                                <field name="name"/>
+                                <field name="type"/>
+                            </group>
+                            <group>
+                                <field name="create_date"/>
+                            </group>
+                        </group>
+                        <group>
+                            <field name="description"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="emxe_flutter_log_tree_view" model="ir.ui.view">
+            <field name="name">emxe_flutter_log_tree_view</field>
+            <field name="model">emxe.flutter.log</field>
+            <field name="arch" type="xml">
+                <tree string="">
+                    <field name="create_date"/>
+                    <field name="name"/>
+                    <field name="type"/>
+                </tree>
+            </field>
+        </record>
+        <record id="emxe_flutter_log_act_window" model="ir.actions.act_window">
+            <field name="name">### Flutter API </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">emxe.flutter.log</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem parent="base.next_id_9" id="emxe_flutter_log_menu" action="emxe_flutter_log_act_window" sequence="303"/>
+    </data>
+</odoo>

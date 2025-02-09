@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="hc_transport_vendor_hoang_chau" model="hc.transport.vendor">
+            <field name="name">Hoàng Châu</field>
+        </record>
+    </data>
+</odoo>

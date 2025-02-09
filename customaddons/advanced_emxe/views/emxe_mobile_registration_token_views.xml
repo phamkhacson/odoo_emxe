@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="emxe_mobile_registration_token_form_views" model="ir.ui.view">
+            <field name="name">emxe_mobile_registration_token_form_views</field>
+            <field name="model">emxe.mobile.registration.token</field>
+            <field name="arch" type="xml">
+                <form string="Firebase registration token">
+                    <header>
+                        <button name="test_send_fcm_notification" string="test send noti" type="object"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="user_id"/>
+                            <field name="token"/>
+                            <field name="test_noti_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="emxe_mobile_registration_token_tree_views" model="ir.ui.view">
+            <field name="name">emxe_mobile_registration_token_tree_views</field>
+            <field name="model">emxe.mobile.registration.token</field>
+            <field name="arch" type="xml">
+                <tree string="Firebase registration token">
+                    <field name="user_id"/>
+                    <field name="token"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="emxe_mobile_registration_token_act_window" model="ir.actions.act_window">
+            <field name="name">Firebase registration token</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">emxe.mobile.registration.token</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+<!--        <menuitem parent="base.next_id_9" id="tt_api_logging_menu" action="tt_api_logging_act_window" sequence="300"/>-->
+
+        <menuitem name="Firebase registration token" id="emxe_mobile_registration_token_menu" parent="base.next_id_9"
+                  action="emxe_mobile_registration_token_act_window" sequence="300"/>
+
+    </data>
+</odoo>

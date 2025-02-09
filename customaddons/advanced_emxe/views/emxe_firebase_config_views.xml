@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="emxe_firebase_config_form_view" model="ir.ui.view">
+            <field name="name">emxe_firebase_config_form_view</field>
+            <field name="model">emxe.firebase.config</field>
+            <field name="arch" type="xml">
+                <form string="">
+                    <sheet>
+                        <field name="name"/>
+                        <field name="firebase_admin_key_file"/>
+<!--                        <button name="send_fcm_notification" string="SEND" type="object" class="oe_highlight" />-->
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_emxe_firebase_config_form_view" model="ir.actions.server">
+            <field name="name">Firebase Project app</field>
+            <field name="model_id" ref="advanced_emxe.model_emxe_firebase_config"/>
+            <field name="binding_view_types">form</field>
+            <field name="state">code</field>
+            <field name="code">action = model.emxe_firebase_config_views()</field>
+        </record>
+
+        <menuitem id="action_emxe_firebase_config_menu"
+                  name="Firebase Project" action="action_emxe_firebase_config_form_view"
+                  parent="base.next_id_9"
+                  sequence="303"
+        />
+
+
+    </data>
+</odoo>

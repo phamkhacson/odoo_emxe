@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="wizard_select_trip_data_view_form" model="ir.ui.view">
+            <field name="name">wizard.select.trip.data.view.form</field>
+            <field name="model">wizard.select.trip.data</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="stage_ids" widget="many2many_tags" attrs="{'invisible': [('type', '!=', 'stage')],'required': [('type', '=', 'stage')]}" options="{'no_quick_create': True}"/>
+                            <field name="series_id" attrs="{'invisible': [('type', '=', 'stage')],'required': [('type', '!=', 'stage')]}"/>
+                            <field name="type" invisible="1"/>
+                        </group>
+                    </sheet>
+                    <footer>
+                        <button name="confirm" confirm="Bạn có chắc chắn muốn chọn chuyến? Lưu ý rằng, sau khi chọn chuyến, dữ liệu lịch trình hiện tại sẽ được thay thế dựa theo lịch trình chặng được cấu hình cho chuyến!" string="Xác nhận chọn chuyến" type="object" attrs="{'invisible': [('type', '=', 'stage')]}" class="oe_highlight"/>
+                        <button name="confirm" string="Xác nhận chọn chặng" attrs="{'invisible': [('type', '!=', 'stage')]}" type="object" class="oe_highlight"/>
+                        <button string="Hủy" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

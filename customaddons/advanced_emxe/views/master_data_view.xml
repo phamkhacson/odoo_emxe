@@ -1,0 +1,879 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <menuitem id="hc_data_menu_root" name="Quản lý chuyến" sequence="1"/>
+        <menuitem id="hc_vehicle_management_menu" name="Quản lý xe" sequence="2"/>
+        <menuitem id="hc_configuration_menu" name="Cấu hình" parent="hc_data_menu_root" sequence="50"/>
+        <record id="hc_dealer_view_tree" model="ir.ui.view">
+            <field name="name">hc.dealer.view.tree</field>
+            <field name="model">hc.dealer</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="tax"/>
+                    <field name="email"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_dealer_view_form" model="ir.ui.view">
+            <field name="name">hc.dealer.view.form</field>
+            <field name="model">hc.dealer</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="company_name"/>
+                            <field name="address"/>
+                            <field name="phone"/>
+                            <field name="tax"/>
+                            <field name="email"/>
+                        </group>
+                        <group>
+                            <field name="related_user_ids">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="position"/>
+                                    <field name="phone"/>
+                                </tree>
+                            </field>
+                            <field name="bank_account_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="bank_name"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_dealer_view_action" model="ir.actions.act_window">
+            <field name="name">Đại lý</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.dealer</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_dealer_view_menu" name="Đại lý" parent="hc_configuration_menu" action="hc_dealer_view_action" sequence="1"/>
+        <record id="hc_vehicle_view_tree" model="ir.ui.view">
+            <field name="name">hc.vehicle.view.tree</field>
+            <field name="model">hc.vehicle</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="license_plate"/>
+                    <field name="type"/>
+                    <field name="own_vehicle_id"/>
+                    <field name="driver_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_vehicle_view_form" model="ir.ui.view">
+            <field name="name">hc.vehicle.view.form</field>
+            <field name="model">hc.vehicle</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <group>
+                            <field name="license_plate"/>
+                            <field name="type"/>
+                            <field name="own_vehicle_id"/>
+                            <field name="driver_id"/>
+                            <field name="process_trip_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_vehicle_view_action" model="ir.actions.act_window">
+            <field name="name">Xe</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.vehicle</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_vehicle_view_menu" name="Xe" parent="hc_vehicle_management_menu" action="hc_vehicle_view_action" sequence="5"/>
+        <record id="hc_vehicle_type_view_tree" model="ir.ui.view">
+            <field name="name">hc.vehicle.type.view.tree</field>
+            <field name="model">hc.vehicle.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="seat_count"/>
+                    <field name="driver_salary_percent"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_vehicle_type_view_form" model="ir.ui.view">
+            <field name="name">hc.vehicle.type.view.form</field>
+            <field name="model">hc.vehicle.type</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="seat_count"/>
+                            <field name="driver_salary_percent"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_vehicle_type_view_action" model="ir.actions.act_window">
+            <field name="name">Loại xe</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.vehicle.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_vehicle_type_view_menu" name="Loại xe" parent="hc_vehicle_management_menu" action="hc_vehicle_type_view_action" sequence="10"/>
+        <record id="hc_transport_vendor_view_tree" model="ir.ui.view">
+            <field name="name">hc.transport.vendor.view.tree</field>
+            <field name="model">hc.transport.vendor</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="owner_id"/>
+                    <field name="owner_identification_number"/>
+                    <field name="review_point"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_transport_vendor_view_form" model="ir.ui.view">
+            <field name="name">hc.transport.vendor.view.form</field>
+            <field name="model">hc.transport.vendor</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="owner_id"/>
+                            <field name="owner_identification_number"/>
+                            <field name="phone"/>
+                            <field name="email"/>
+                            <field name="review_point"/>
+                            <field name="vehicle_ids" readonly="1">
+                                <tree>
+                                    <field name="license_plate"/>
+                                    <field name="type"/>
+                                    <field name="driver_id"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_transport_vendor_view_action" model="ir.actions.act_window">
+            <field name="name">Nhà xe</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.transport.vendor</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_transport_vendor_view_menu" name="Nhà xe" parent="hc_vehicle_management_menu" action="hc_transport_vendor_view_action" sequence="15"/>
+        <record id="hc_trip_cost_type_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.cost.type.view.tree</field>
+            <field name="model">hc.trip.cost.type</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_cost_type_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.cost.type.view.form</field>
+            <field name="model">hc.trip.cost.type</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_cost_type_view_action" model="ir.actions.act_window">
+            <field name="name">Loại chi phí</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.cost.type</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_trip_cost_type_view_menu" name="Loại chi phí" parent="hc_configuration_menu" action="hc_trip_cost_type_view_action" sequence="20"/>
+        <record id="hc_trip_stage_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.stage.view.tree</field>
+            <field name="model">hc.trip.stage</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="pick_up_place"/>
+                    <field name="destination"/>
+                    <field name="km_count"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_stage_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.stage.view.form</field>
+            <field name="model">hc.trip.stage</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="pick_up_place"/>
+                            <field name="destination"/>
+                            <field name="km_count"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_stage_view_action" model="ir.actions.act_window">
+            <field name="name">Chặng</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.stage</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_trip_stage_view_menu" name="Chặng" parent="hc_configuration_menu" action="hc_trip_stage_view_action" sequence="25"/>
+        <record id="hc_trip_series_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.series.view.tree</field>
+            <field name="model">hc.trip.series</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="source_place"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_series_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.series.view.form</field>
+            <field name="model">hc.trip.series</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="source_place"/>
+                            <field name="trip_stage_ids">
+                                <tree>
+                                    <field name="pick_up_place"/>
+                                    <field name="destination"/>
+                                    <field name="km_count"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_series_view_action" model="ir.actions.act_window">
+            <field name="name">Series chuyến</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.series</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_trip_series_view_menu" name="Series chuyến" parent="hc_configuration_menu" action="hc_trip_series_view_action" sequence="30"/>
+        <record id="hc_trip_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.view.tree</field>
+            <field name="model">hc.trip</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="dealer_id"/>
+                    <field name="hc_code"/>
+                    <field name="series_id"/>
+                    <field name="pick_up_place"/>
+                    <field name="destination"/>
+                    <field name="start_time"/>
+                    <field name="vehicle_id"/>
+                    <field name="transport_vendor_id"/>
+                    <field name="customer_amount" string="Doanh thu bán" sum="Tổng doanh thu bán"/>
+                    <field name="transport_vendor_amount" string="Thanh toán cho nhà xe" sum="Tổng thanh toán"/>
+                    <field name="vehicle_type_id" optional="hide"/>
+                    <field name="license_plate" optional="hide"/>
+                    <field name="driver_id" optional="hide"/>
+                    <field name="note" optional="hide"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_view_tree2" model="ir.ui.view">
+            <field name="name">hc.trip.view.tree2</field>
+            <field name="model">hc.trip</field>
+            <field name="priority" eval="40"/>
+            <field name="arch" type="xml">
+                <tree create="0" edit="0" delete="0">
+                    <field name="customer_code"/>
+                    <field name="hc_code"/>
+                    <field name="pick_up_place"/>
+                    <field name="destination"/>
+                    <field name="vehicle_type_id"/>
+                    <field name="hc_income_include_vat" sum="Tổng doanh thu"/>
+                    <field name="oil_cost" sum="Tổng chi phí dầu"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_view_tree3" model="ir.ui.view">
+            <field name="name">hc.trip.view.tree3</field>
+            <field name="model">hc.trip</field>
+            <field name="priority" eval="50"/>
+            <field name="arch" type="xml">
+                <tree create="0" edit="0" delete="0">
+                    <field name="transport_vendor_id"/>
+                    <field name="customer_code"/>
+                    <field name="hc_code"/>
+                    <field name="state"/>
+                    <field name="pick_up_place"/>
+                    <field name="destination"/>
+                    <field name="vehicle_type_id"/>
+                    <field name="customer_amount" string="Doanh thu bán chuyến"/>
+                    <field name="transport_vendor_amount" string="Thanh toán cho nhà xe vệ tinh"/>
+                    <field name="hc_revenue"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_view_tree4" model="ir.ui.view">
+            <field name="name">hc.trip.view.tree4</field>
+            <field name="model">hc.trip</field>
+            <field name="priority" eval="60"/>
+            <field name="arch" type="xml">
+                <tree create="0" edit="0" delete="0">
+                    <field name="customer_code"/>
+                    <field name="hc_code"/>
+                    <field name="pick_up_place"/>
+                    <field name="destination"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                    <field name="hc_income_include_vat" sum="Tổng doanh thu"/>
+                    <field name="driver_salary" sum="Tổng chi phí dầu"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.view.form</field>
+            <field name="model">hc.trip</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="confirm_trip" string="Điều xe" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <button name="send_notify_to_dealer" string="Gửi thông báo cho đại lý" type="object" class="oe_highlight"/>
+                        <button name="mark_as_processing" string="Thực hiện" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
+                        <button name="mark_as_payment" string="Hoàn thành chuyến" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'processing')]}"/>
+                        <button name="mark_as_done" string="Hoàn thành thanh toán" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'payment')]}"/>
+                        <button name="action_cancel_trip" string="Hủy chuyến" type="object" class="oe_highlight" attrs="{'invisible': [('state', '=', 'cancel')]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_auction" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_value">
+                                        <field name="auction_count"/>
+                                    </span>
+                                    <span class="o_stat_text">
+                                        Đấu giá
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="hc_code" readonly="0"/>
+                                <field name="dealer_id" readonly="0"/>
+                                <field name="customer_code" readonly="0"/>
+                                <field name="customer_representative" readonly="0"/>
+                                <field name="tour_guide" readonly="0"/>
+                                <field name="tour_guide_phone" readonly="0"/>
+                                <field name="vehicle_type_id"/>
+                                <field name="transport_vendor_id"/>
+                                <field name="vehicle_id" attrs="{'readonly':[('transport_vendor_id','=', False)]}"/>
+                                <field name="driver_id" readonly="0"/>
+                                <field name="driver_phone"/>
+                                <field name="driver_accept"/>
+                                <field name="series_id" readonly="0"/>
+                                <field name="start_time"/>
+                                <field name="end_time"/>
+                                <field name="pick_up_place" readonly="0"/>
+                                <field name="destination" readonly="0"/>
+                                <field name="note"/>
+                                <field name="oil_cost"/>
+                            </group>
+                            <group groups="advanced_emxe.hc_group_accountant,base.group_system">
+                                <field name="customer_amount"/>
+                                <field name="remain_customer_amount"/>
+                                <field name="transport_vendor_amount"/>
+                                <field name="hc_revenue"/>
+                                <field name="net_profit"/>
+                                <field name="operation_cost_amount"/>
+                                <field name="driver_salary" attrs="{'invisible':[('transport_vendor_id','!=', 1)]}"/>
+                                <field name="start_time_actual"/>
+                                <field name="end_time_actual"/>
+                                <field name="trip_pause_time"/>
+                                <field name="pause_time_count"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Thu" name="income" groups="advanced_emxe.hc_group_accountant,base.group_system">
+                                <h3>Tiền thu</h3>
+                                <field name="income_detail_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="income_id" domain="[('entry_type', 'in', ['income', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
+                                        <field name="qty"/>
+                                        <field name="price"/>
+                                        <field name="amount" sum="Tổng"/>
+                                    </tree>
+                                </field>
+                                <h3>Tiền đã thu</h3>
+                                <field name="income_payment_detail_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="payment_income_id" domain="[('entry_type', 'in', ['payment_income', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
+                                        <field name="payment_amount" sum="Tổng"/>
+                                        <field name="note"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Chi" name="cost" groups="advanced_emxe.hc_group_accountant,base.group_system">
+                                <h3>Chi phí đã chi cho nhà xe</h3>
+                                <field name="cost_detail_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="cost_id" domain="[('entry_type', 'in', ['cost', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
+                                        <field name="qty"/>
+                                        <field name="price"/>
+                                        <field name="amount" sum="Tổng"/>
+                                    </tree>
+                                </field>
+                                <h3>Tiền đã chi</h3>
+                                <field name="cost_payment_detail_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="paid_cost_id" domain="[('entry_type', 'in', ['paid_cost', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
+                                        <field name="payment_amount" sum="Tổng"/>
+                                        <field name="note"/>
+                                    </tree>
+                                </field>
+                                <h3>Các khoản lái xe đã chi</h3>
+                                <field name="driver_cost_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="driver_cost_id" domain="[('entry_type', 'in', ['driver_cost', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
+                                        <field name="payment_amount" sum="Tổng"/>
+                                        <field name="note"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Chi phí nội bộ" name="operation_cost" groups="advanced_emxe.hc_group_accountant,base.group_system">
+                                <field name="operation_cost_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="operation_cost_id" domain="[('entry_type', '=', 'operation_cost')]" options="{'no_open': True, 'no_create': True}"/>
+                                        <field name="operation_cost_price" sum="Tổng"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Người phụ trách" name="person_in_charge">
+                                <group>
+                                    <field name="operator_id" string="Điều hành phụ trách"/>
+                                    <field name="accountant_id" string="Kế toán phụ trách"/>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="hc_trip_batch_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.batch.view.form</field>
+            <field name="model">hc.trip.batch</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="button_confirm" string="Điều xe" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <div class="oe_button_box" name="button_box">
+                            <button name="action_view_trip"
+                                    type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                                <div class="o_stat_info">
+                                    <span class="o_stat_text">
+                                        Danh sách
+                                    </span>
+                                    <span class="o_stat_text">
+
+                                        chuyến
+                                    </span>
+                                </div>
+                            </button>
+                        </div>
+                        <group>
+                            <field name="hc_code" readonly="1"/>
+                            <field name="is_common_info" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="transport_vendor_id" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="vehicle_id" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="driver_id" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="driver_phone" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)]}"/>
+                        </group>
+                        <group>
+                            <field name="hc_trip_ids">
+                                <tree create="false" delete="false" editable="bottom">
+                                    <field name="hc_code" readonly="1"/>
+                                    <field name="transport_vendor_id" attrs="{'readonly': [('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="vehicle_id" attrs="{'readonly': [('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="driver_id" attrs="{'readonly': [('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="driver_phone" force_save="True"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="hc_trip_view_search" model="ir.ui.view">
+            <field name="name">hc.trip.view.search</field>
+            <field name="model">hc.trip</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="dealer_id"/>
+                    <field name="driver_id"/>
+                    <field name="hc_code"/>
+                    <field name="start_time"/>
+                    <field name="end_time"/>
+                    <field name="pick_up_place"/>
+                    <field name="destination"/>
+                    <filter string="Chưa điều xe" name="unassigned_vehicle" domain=" [('vehicle_id','=',False)]"/>
+                    <filter string="Nhà xe Hoàng Châu" name="hc_trip" domain=" [('transport_vendor_id','=',1)]"/>
+                    <filter string="Tháng 1" name="january" domain="[('create_date','&lt;=',context_today().strftime('%Y-01-31')),('create_date','>=',context_today().strftime('%Y-01-01'))]"/>
+                    <filter string="Tháng 2" name="february" domain="[('create_date','&lt;=',context_today().strftime('%Y-02-29')),('create_date','>=',context_today().strftime('%Y-02-01'))]"/>
+                    <filter string="Tháng 3" name="march" domain="[('create_date','&lt;=',context_today().strftime('%Y-03-31')),('create_date','>=',context_today().strftime('%Y-03-01'))]"/>
+                    <filter string="Tháng 4" name="april" domain="[('create_date','&lt;=',context_today().strftime('%Y-04-30')),('create_date','>=',context_today().strftime('%Y-04-01'))]"/>
+                    <filter string="Tháng 5" name="may" domain="[('create_date','&lt;=',context_today().strftime('%Y-05-31')),('create_date','>=',context_today().strftime('%Y-05-01'))]"/>
+                    <filter string="Tháng 6" name="june" domain="[('create_date','&lt;=',context_today().strftime('%Y-06-30')),('create_date','>=',context_today().strftime('%Y-06-01'))]"/>
+                    <filter string="Tháng 7" name="july" domain="[('create_date','&lt;=',context_today().strftime('%Y-07-31')),('create_date','>=',context_today().strftime('%Y-07-01'))]"/>
+                    <filter string="Tháng 8" name="august" domain="[('create_date','&lt;=',context_today().strftime('%Y-08-31')),('create_date','>=',context_today().strftime('%Y-08-01'))]"/>
+                    <filter string="Tháng 9" name="september" domain="[('create_date','&lt;=',context_today().strftime('%Y-09-30')),('create_date','>=',context_today().strftime('%Y-09-01'))]"/>
+                    <filter string="Tháng 10" name="october" domain="[('create_date','&lt;=',context_today().strftime('%Y-10-31')),('create_date','>=',context_today().strftime('%Y-10-01'))]"/>
+                    <filter string="Tháng 11" name="november" domain="[('create_date','&lt;=',context_today().strftime('%Y-11-30')),('create_date','>=',context_today().strftime('%Y-11-01'))]"/>
+                    <filter string="Tháng 12" name="december" domain="[('create_date','&lt;=',context_today().strftime('%Y-12-31')),('create_date','>=',context_today().strftime('%Y-12-01'))]"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Đại lý" name="group_by_dealer" domain="" context="{'group_by':'dealer_id'}"/>
+                        <filter string="Code HC" name="group_by_hc_code" domain="" context="{'group_by':'hc_code'}"/>
+                        <filter string="Xe" name="group_by_vehicle" domain="" context="{'group_by':'vehicle_id'}"/>
+                        <filter string="Lái xe" name="group_by_driver" domain="" context="{'group_by':'driver_id'}"/>
+                        <filter string="Nhà xe" name="group_by_transport_vendor" domain="" context="{'group_by':'transport_vendor_id'}"/>
+                        <filter string="Điều hành" name="group_by_operator" domain="" context="{'group_by':'operator_id'}"/>
+                        <filter string="Kế toán" name="group_by_accountant" domain="" context="{'group_by':'accountant_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="hc_trip_view_action" model="ir.actions.act_window">
+            <field name="name">Thay đổi thông tin chuyến</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_unassigned_vehicle": 1,"search_default_group_by_hc_code": 1}</field>
+        </record>
+        <record id="hc_trip_batch_view_action" model="ir.actions.act_window">
+            <field name="name">Điều chuyến</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.batch</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_group_by_hc_code": 1, "create": 0, "delete": 0}</field>
+        </record>
+        <menuitem id="hc_trip_view_menu_root" name="Chuyến xe" parent="hc_data_menu_root" sequence="35"/>
+        <menuitem id="hc_trip_view_menu" name="Thay đổi thông tin chuyến" parent="hc_trip_view_menu_root" action="hc_trip_view_action" sequence="1"/>
+        <menuitem id="hc_trip_batch_view_menu" name="Điều chuyến" parent="hc_trip_view_menu_root" action="hc_trip_batch_view_action" sequence="2"/>
+        <record id="hc_trip_preview_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.preview.view.tree</field>
+            <field name="model">hc.trip.preview</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="dealer_id"/>
+                    <field name="hc_code"/>
+                    <field name="customer_code"/>
+                    <field name="series_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_preview_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.preview.view.form</field>
+            <field name="model">hc.trip.preview</field>
+            <field name="arch" type="xml">
+                <form>
+                    <header>
+                        <button name="confirm" string="Xác nhận tạo chuyến" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_batch_trip" attrs="{'invisible': [('hc_trip_batch_id', '=', False)]}" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">
+                                    Chuyến
+                                </span>
+                                <span class="o_stat_text">
+
+                                    gộp
+                                </span>
+                                <field name="hc_trip_batch_id" invisible="1"/>
+                            </div>
+                        </button>
+                        <button name="action_view_trip" attrs="{'invisible': [('state', '=', 'draft')]}" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">
+                                    Danh sách
+                                </span>
+                                <span class="o_stat_text">
+
+                                    chuyến
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="hc_code" readonly="0"/>
+                            <field name="dealer_id" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="customer_code" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="vehicle_type_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="series_id" readonly="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+                        <group>
+                            <field name="is_common_info" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="customer_representative" attrs="{'invisible': [('is_common_info', '=', True)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="tour_guide" attrs="{'invisible': [('is_common_info', '=', True)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="tour_guide_phone" attrs="{'invisible': [('is_common_info', '=', True)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="note" attrs="{'invisible': [('is_common_info', '=', True)], 'readonly': [('state', '!=', 'draft')]}"/>
+                        </group>
+                    </group>
+                    <button name="select_series" string="Chọn series chuyến có sẵn" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <h3>Lịch trình</h3>
+                    <button name="select_stage" string="Chọn chặng có sẵn" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
+                    <field name="schedule_ids" nolabel="1">
+                        <tree editable="bottom" delete="0">
+                            <field name="pick_up_place" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
+                            <field name="destination" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
+                            <field name="start_time" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
+                            <field name="end_time" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
+                            <field name="km_estimate" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
+                            <field name="price" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
+                            <field name="freight_cost"/>
+                            <field name="customer_representative" attrs="{'readonly': ['|', ('trip_id', '!=', False), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                            <field name="tour_guide" attrs="{'readonly': ['|', ('trip_id', '!=', False), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                            <field name="tour_guide_phone" attrs="{'readonly': ['|', ('trip_id', '!=', False), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                            <field name="note" attrs="{'readonly': ['|', ('trip_id', '!=', False), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                            <field name="trip_id" readonly="1"/>
+                            <field name="id" invisible="1"/>
+                            <button name="action_create_trip" string="Bổ sung lịch trình" type="object" class="oe_highlight" attrs="{'invisible': ['|',('parent.state', '=', 'draft'),('trip_id', '!=', False)]}"/>
+                            <button name="unlink_schedule" confirm="Bạn có chắc chắn muốn xóa bản ghi?" type="object" icon="fa-trash-o" attrs="{'invisible': [('id', '=', False)]}"/>
+                        </tree>
+                    </field>
+                    <div class="oe_chatter">
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+        <record id="hc_trip_preview_view_search" model="ir.ui.view">
+            <field name="name">hc.trip.preview.view.search</field>
+            <field name="model">hc.trip.preview</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="dealer_id"/>
+                    <field name="hc_code"/>
+                    <field name="pick_up_place"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Đại lý" name="group_by_dealer" domain="" context="{'group_by':'dealer_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="hc_trip_preview_view_action" model="ir.actions.act_window">
+            <field name="name">Danh sách khởi tạo chuyến</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.trip.preview</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_group_by_dealer": 1}</field>
+        </record>
+        <menuitem id="hc_trip_preview_view_menu" name="Khởi tạo chuyến" parent="hc_data_menu_root" action="hc_trip_preview_view_action" sequence="10"/>
+        <record id="hc_trip_auction_history_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.auction.history.view.tree</field>
+            <field name="model">hc.trip.auction.history</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="transport_vendor_id"/>
+                    <field name="est_cost"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_trip_auction_history_view_form" model="ir.ui.view">
+            <field name="name">hc.trip.auction.history.view.form</field>
+            <field name="model">hc.trip.auction.history</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="transport_vendor_id"/>
+                            <field name="est_cost"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_oil_management_view_tree" model="ir.ui.view">
+            <field name="name">hc.oil.management.view.tree</field>
+            <field name="model">hc.oil.management</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="vehicle_id"/>
+                    <field name="user_id"/>
+                    <field name="date"/>
+                    <field name="liter"/>
+                    <field name="price"/>
+                    <field name="amount"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_oil_management_view_form" model="ir.ui.view">
+            <field name="name">hc.oil.management.view.form</field>
+            <field name="model">hc.oil.management</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="vehicle_id"/>
+                            <field name="user_id"/>
+                            <field name="date"/>
+                            <field name="liter"/>
+                            <field name="price"/>
+                            <field name="amount"/>
+                            <field name="start_km"/>
+                            <field name="end_km"/>
+                            <field name="run_km"/>
+                            <field name="mtt"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_oil_management_view_search" model="ir.ui.view">
+            <field name="name">hc.oil.management.view.search</field>
+            <field name="model">hc.oil.management</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="vehicle_id"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Xe" name="group_by_vehicle" domain="" context="{'group_by':'vehicle_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="hc_oil_management_action" model="ir.actions.act_window">
+            <field name="name">Quản lý dầu</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.oil.management</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_group_by_vehicle": 1}</field>
+        </record>
+        <menuitem id="hc_oil_management_menu" name="Quản lý dầu" parent="hc_vehicle_management_menu" action="hc_oil_management_action" sequence="20"/>
+        <record id="hc_repair_management_view_tree" model="ir.ui.view">
+            <field name="name">hc.repair.management.view.tree</field>
+            <field name="model">hc.repair.management</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="vehicle_id"/>
+                    <field name="user_id"/>
+                    <field name="date"/>
+                    <field name="amount"/>
+                    <field name="note"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_repair_management_view_form" model="ir.ui.view">
+            <field name="name">hc.repair.management.view.form</field>
+            <field name="model">hc.repair.management</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="vehicle_id"/>
+                            <field name="user_id"/>
+                            <field name="date"/>
+                            <field name="amount"/>
+                            <field name="note"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_repair_management_view_search" model="ir.ui.view">
+            <field name="name">hc.repair.management.view.search</field>
+            <field name="model">hc.repair.management</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="vehicle_id"/>
+                    <separator/>
+                    <group expand="0" string="Group By">
+                        <filter string="Xe" name="group_by_vehicle" domain="" context="{'group_by':'vehicle_id'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="hc_repair_management_action" model="ir.actions.act_window">
+            <field name="name">Quản lý sửa chữa</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.repair.management</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{"search_default_group_by_vehicle": 1}</field>
+        </record>
+        <menuitem id="hc_repair_management_menu" name="Quản lý sửa chữa" parent="hc_vehicle_management_menu" action="hc_repair_management_action" sequence="25"/>
+        <record id="hc_executive_group_view_tree" model="ir.ui.view">
+            <field name="name">hc.executive.group.view.tree</field>
+            <field name="model">hc.executive.group</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="name"/>
+                    <field name="dealer_id"/>
+                    <field name="operator_id"/>
+                    <field name="accountant_id"/>
+                </tree>
+            </field>
+        </record>
+        <record id="hc_executive_group_view_form" model="ir.ui.view">
+            <field name="name">hc.executive.group.view.form</field>
+            <field name="model">hc.executive.group</field>
+            <field name="arch" type="xml">
+                <form>
+                    <sheet>
+                        <group>
+                            <field name="name"/>
+                            <field name="dealer_id"/>
+                            <field name="operator_id"/>
+                            <field name="accountant_id"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+        <record id="hc_executive_group_action" model="ir.actions.act_window">
+            <field name="name">Nhóm điều hành</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hc.executive.group</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="hc_executive_group_menu" name="Nhóm điều hành" parent="advanced_emxe.hc_configuration_menu" action="hc_executive_group_action" sequence="35"/>
+    </data>
+</odoo>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.module.category" id="hc_group_catg">
+            <field name="name"># HC</field>
+            <field name="sequence">1</field>
+        </record>
+        <record id="hc_group_driver" model="res.groups">
+            <field name="name"># Lái xe</field>
+            <field name="category_id" ref="advanced_emxe.hc_group_catg"/>
+        </record>
+        <record id="hc_group_dealer" model="res.groups">
+            <field name="name"># Đại lý</field>
+            <field name="category_id" ref="advanced_emxe.hc_group_catg"/>
+        </record>
+        <record id="hc_group_vehicle_owner" model="res.groups">
+            <field name="name"># Chủ nhà xe</field>
+            <field name="category_id" ref="advanced_emxe.hc_group_catg"/>
+        </record>
+        <record id="hc_group_accountant" model="res.groups">
+            <field name="name"># Kế toán</field>
+            <field name="category_id" ref="advanced_emxe.hc_group_catg"/>
+        </record>
+        <record id="hc_group_admin" model="res.groups">
+            <field name="name"># Admin</field>
+            <field name="category_id" ref="advanced_emxe.hc_group_catg"/>
+        </record>
+        <record id="hc_group_operator" model="res.groups">
+            <field name="name"># Điều hành</field>
+            <field name="category_id" ref="advanced_emxe.hc_group_catg"/>
+        </record>
+    </data>
+</odoo>
