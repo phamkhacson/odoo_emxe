@@ -334,6 +334,17 @@ class HcTrip(models.Model):
             'context': {'default_trip_id': self.id}
         }
 
+    def action_view_trip(self):
+        return {
+            'name': "Chuyến xe",
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'hc.trip',
+            'target': 'current',
+            'res_id': self.id,
+            'context': {'default_source_id': self.id}
+        }
+
     @api.model
     def read_group(self, domain, fields, groupby, offset=0, limit=None, orderby=False, lazy=True):
         res = super(HcTrip, self).read_group(domain, fields, groupby, offset=offset, limit=limit, orderby=orderby, lazy=lazy)

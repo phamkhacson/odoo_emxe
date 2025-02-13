@@ -27,7 +27,10 @@ class HcTripBatch(models.Model):
         self.state = 'confirm'
         message = f'Đã điều chuyến xe gộp mã: {self.hc_code}'
         self.message_post(body=message, message_type='comment')
-        self.hc_trip_ids.confirm_trip()
+        # confirm only the trips that are in draft state
+        draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
+        if draft_trip_ids:
+            draft_trip_ids.confirm_trip()
 
     def action_view_trip(self):
         return {
@@ -43,7 +46,8 @@ class HcTripBatch(models.Model):
     @api.onchange('is_common_info')
     def onchange_is_common_info(self):
         if not self.is_common_info:
-            for trip in self.hc_trip_ids:
+            draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
+            for trip in draft_trip_ids:
                 trip.sudo().write({
                     'transport_vendor_id': self.transport_vendor_id,
                     'vehicle_id': self.vehicle_id,
@@ -53,18 +57,21 @@ class HcTripBatch(models.Model):
     @api.onchange('transport_vendor_id')
     def onchange_transport_vendor_id(self):
         if not self.is_common_info:
-            for trip in self.hc_trip_ids:
+            draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
+            for trip in draft_trip_ids:
                 trip.transport_vendor_id = self.transport_vendor_id
 
     @api.onchange('vehicle_id')
     def onchange_vehicle_id(self):
         if not self.is_common_info:
-            for trip in self.hc_trip_ids:
+            draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
+            for trip in draft_trip_ids:
                 trip.vehicle_id = self.vehicle_id
 
     @api.onchange('driver_id')
     def onchange_driver_id(self):
         if not self.is_common_info:
-            for trip in self.hc_trip_ids:
+            draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
+            for trip in draft_trip_ids:
                 trip.driver_id = self.driver_id
 

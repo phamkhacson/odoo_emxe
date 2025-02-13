@@ -521,10 +521,12 @@
                             <field name="hc_trip_ids">
                                 <tree create="false" delete="false" editable="bottom">
                                     <field name="hc_code" readonly="1"/>
-                                    <field name="transport_vendor_id" attrs="{'readonly': [('parent.is_common_info', '=', False)]}" force_save="True"/>
-                                    <field name="vehicle_id" attrs="{'readonly': [('parent.is_common_info', '=', False)]}" force_save="True"/>
-                                    <field name="driver_id" attrs="{'readonly': [('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="state" invisible="1"/>
+                                    <field name="transport_vendor_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="vehicle_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="driver_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                                     <field name="driver_phone" force_save="True"/>
+                                    <button name="action_view_trip" string="Open" type="object" icon="fa-pencil-square-o"/>
                                 </tree>
                             </field>
                         </group>
@@ -661,6 +663,7 @@
                     <button name="select_stage" string="Chọn chặng có sẵn" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
                     <field name="schedule_ids" nolabel="1">
                         <tree editable="bottom" delete="0">
+                            <field name='sequence' widget='handle' attrs="{'invisible': [('parent.state', '!=', 'draft')]}"/>
                             <field name="pick_up_place" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
                             <field name="destination" attrs="{'readonly': [('trip_id', '!=', False)]}"/>
                             <field name="start_time" attrs="{'readonly': [('trip_id', '!=', False)]}"/>

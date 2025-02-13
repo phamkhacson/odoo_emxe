@@ -9,6 +9,7 @@ class HcTripSchedule(models.Model):
     _name = 'hc.trip.schedule'
     _description = 'Lịch trình chuyến xe'
     _rec_name = 'pick_up_place'
+    _order = "sequence,id"
 
     def _get_start_time_default(self):
         return datetime.now().replace(hour=4, minute=0, second=0) - timedelta(hours=7)
@@ -16,6 +17,7 @@ class HcTripSchedule(models.Model):
     def _get_end_time_default(self):
         return datetime.now().replace(hour=22, minute=0, second=0) - timedelta(hours=7)
 
+    sequence = fields.Integer(string="Thứ tự", default=10)
     pick_up_place = fields.Char(string="Điểm đón khách")
     destination = fields.Char(string="Điểm trả khách")
     start_time = fields.Datetime(string="Khởi hành lúc", default=_get_start_time_default)
