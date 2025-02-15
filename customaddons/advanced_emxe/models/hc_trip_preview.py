@@ -112,15 +112,15 @@ class HcTripPreview(models.Model):
 
     def confirm(self):
         for rec in self:
-            if not rec.is_common_info:
-                if not rec.customer_representative:
-                    raise UserError("Thiếu cấu hình Đại diện khách hàng")
-                if not rec.tour_guide:
-                    raise UserError("Thiếu cấu hình Hướng dẫn viên")
-                if not rec.tour_guide_phone:
-                    raise UserError("Thiếu cấu hình Sđt Hướng dẫn viên")
-                if not rec.note:
-                    raise UserError("Thiếu cấu hình Ghi chú")
+            # if not rec.is_common_info:
+            #     if not rec.customer_representative:
+            #         raise UserError("Thiếu cấu hình Đại diện khách hàng")
+            #     if not rec.tour_guide:
+            #         raise UserError("Thiếu cấu hình Hướng dẫn viên")
+            #     if not rec.tour_guide_phone:
+            #         raise UserError("Thiếu cấu hình Sđt Hướng dẫn viên")
+            #     if not rec.note:
+            #         raise UserError("Thiếu cấu hình Ghi chú")
             rec.sudo().state = 'confirm'
             operator_id = False
             accountant_id = False

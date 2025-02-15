@@ -380,17 +380,17 @@
                         </div>
                         <group>
                             <group>
-                                <field name="hc_code" readonly="0"/>
-                                <field name="dealer_id" readonly="0"/>
+                                <field name="hc_code" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="dealer_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="customer_code" readonly="0"/>
                                 <field name="customer_representative" readonly="0"/>
                                 <field name="tour_guide" readonly="0"/>
                                 <field name="tour_guide_phone" readonly="0"/>
-                                <field name="vehicle_type_id"/>
-                                <field name="transport_vendor_id"/>
-                                <field name="vehicle_id" attrs="{'readonly':[('transport_vendor_id','=', False)]}"/>
-                                <field name="driver_id" readonly="0"/>
-                                <field name="driver_phone"/>
+                                <field name="vehicle_type_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="transport_vendor_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="vehicle_id" attrs="{'readonly':['|', ('state','!=', 'draft'), ('transport_vendor_id','=', False)]}"/>
+                                <field name="driver_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="driver_phone" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="driver_accept"/>
                                 <field name="series_id" readonly="0"/>
                                 <field name="start_time"/>
@@ -485,6 +485,19 @@
             </field>
         </record>
 
+        <record id="hc_trip_batch_view_search" model="ir.ui.view">
+            <field name="name">hc.trip.view.batch.search</field>
+            <field name="model">hc.trip.batch</field>
+            <field name="arch" type="xml">
+                <search>
+                    <field name="hc_code"/>
+                    <field name="state"/>
+                    <filter string="Chưa điều xe" name="unassigned_vehicle" domain=" [('state','=','draft')]"/>
+                    <separator/>
+                </search>
+            </field>
+        </record>
+
         <record id="hc_trip_batch_view_form" model="ir.ui.view">
             <field name="name">hc.trip.batch.view.form</field>
             <field name="model">hc.trip.batch</field>
@@ -526,7 +539,7 @@
                                     <field name="vehicle_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                                     <field name="driver_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                                     <field name="driver_phone" force_save="True"/>
-                                    <button name="action_view_trip" string="Open" type="object" icon="fa-pencil-square-o"/>
+                                    <button name="action_view_trip" string="Chi tiết" type="object" icon="fa-pencil-square-o"/>
                                 </tree>
                             </field>
                         </group>
@@ -590,7 +603,7 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">hc.trip.batch</field>
             <field name="view_mode">tree,form</field>
-            <field name="context">{"search_default_group_by_hc_code": 1, "create": 0, "delete": 0}</field>
+            <field name="context">{"search_default_unassigned_vehicle": 1,"search_default_group_by_hc_code": 1, "create": 0, "delete": 0}</field>
         </record>
         <menuitem id="hc_trip_view_menu_root" name="Chuyến xe" parent="hc_data_menu_root" sequence="35"/>
         <menuitem id="hc_trip_view_menu" name="Thay đổi thông tin chuyến" parent="hc_trip_view_menu_root" action="hc_trip_view_action" sequence="1"/>

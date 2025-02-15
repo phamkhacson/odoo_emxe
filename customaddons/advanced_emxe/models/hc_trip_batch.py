@@ -16,7 +16,7 @@ class HcTripBatch(models.Model):
 
     hc_code = fields.Char(string="Code HC", copy=False)
     state = fields.Selection([('draft', 'Khai báo chuyến'), ('confirm', 'Đã điều chuyến')], string="Trạng thái", default='draft')
-    is_common_info = fields.Boolean(string="Chỉnh sửa chi tiết", default=False)
+    is_common_info = fields.Boolean(string="Chỉnh sửa chi tiết", default=True)
     transport_vendor_id = fields.Many2one('hc.transport.vendor', string="Nhà xe")
     vehicle_id = fields.Many2one('hc.vehicle', string="Xe")
     driver_id = fields.Many2one('res.users', string="Tài xế", related="vehicle_id.driver_id", store=True)
