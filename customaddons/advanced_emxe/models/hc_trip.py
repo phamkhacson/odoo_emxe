@@ -270,6 +270,9 @@ class HcTrip(models.Model):
 
     def mark_as_processing(self):
         for rec in self:
+            existed_processing_trip = self.env['hc.trip'].sudo().search([('driver_id', '=', rec.driver_id.id), ('state', '=', 'processing')])
+            if existed_processing_trip:
+                raise UserError('Tài xế đang thực hiện chuyến khác.')
             rec.sudo().state = 'processing'
 
     def mark_as_payment(self):

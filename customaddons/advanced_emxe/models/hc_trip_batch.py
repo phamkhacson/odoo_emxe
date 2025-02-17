@@ -48,7 +48,7 @@ class HcTripBatch(models.Model):
         if not self.is_common_info:
             draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
             for trip in draft_trip_ids:
-                trip.sudo().write({
+                trip.sudo().update({
                     'transport_vendor_id': self.transport_vendor_id,
                     'vehicle_id': self.vehicle_id,
                     'driver_id': self.driver_id

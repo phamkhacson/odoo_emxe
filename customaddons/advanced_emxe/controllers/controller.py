@@ -345,6 +345,7 @@ class EMXEFlutterApi(http.Controller):
                 ('start_time', '>=', date_from),
                 ('start_time', '<=', date_to),
                 ('state', 'in', odoo_state),
+                ('driver_id', 'in', [user.id, False]),
             ], limit=index)
             result = []
             for trip in list_trip:
@@ -381,6 +382,15 @@ class EMXEFlutterApi(http.Controller):
             if id:
                 trip = request.env['hc.trip'].search([('id', '=', int(id))])
                 if trip:
+                    payment_status = ''
+                    if trip.remain_customer_amount > 0:
+                        if trip.remain_customer_amount != trip.customer_amount:
+                            payment_status = 'Thanh toán 1 phần'
+                        else:
+                            payment_status = 'Chưa thanh toán'
+                    else:
+                        payment_status = 'Đã thanh toán'
+
                     result = {
                         "id": trip.id,
                         "name": f"{trip.pick_up_place} - f{trip.destination}",
@@ -389,6 +399,7 @@ class EMXEFlutterApi(http.Controller):
                         "start_in": trip.pick_up_place,
                         "finish_in": trip.destination,
                         "state": self.state_convert(trip.state),
+                        "payment_status": payment_status,
                         "tour_guide": trip.tour_guide,
                         "phone": trip.driver_phone,
                         "transport_vendor": trip.transport_vendor_id.name if trip.transport_vendor_id else False,
@@ -548,7 +559,7 @@ class EMXEFlutterApi(http.Controller):
                             "success": False
                         }
                     }
-                trip.sudo().state = 'processing'
+                trip.sudo().mark_as_processing()
                 trip.sudo().start_time_actual = datetime.now()
                 return {
                     'status': 'success',
@@ -611,7 +622,7 @@ class EMXEFlutterApi(http.Controller):
                             "success": False
                         }
                     }
-                trip.sudo().state = 'payment'
+                trip.sudo().mark_as_payment()
                 trip.sudo().end_time_actual = datetime.now()
                 return {
                     'status': 'success',
