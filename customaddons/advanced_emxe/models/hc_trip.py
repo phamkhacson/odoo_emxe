@@ -62,7 +62,7 @@ class HcTrip(models.Model):
                 raise UserError("Không thể xóa chuyến xe có trạng thái khác 'Khai báo chuyến'")
         super(HcTrip, self).unlink()
 
-    @api.depends()
+    @api.depends('start_time_actual', 'end_time_actual', 'pause_time_count')
     def compute_total_time_actual(self):
         for rec in self:
             total_time_actual = 0

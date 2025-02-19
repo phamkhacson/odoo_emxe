@@ -989,7 +989,7 @@ class EMXEFlutterApi(http.Controller):
                             })
                     result = {
                         "id": trip.id,
-                        "name": f"{trip.pick_up_place} - f{trip.destination}",
+                        "name": f"{trip.pick_up_place} - {trip.destination}",
                         "date": trip.start_time,
                         "start_in": trip.pick_up_place,
                         "finish_in": trip.destination,
