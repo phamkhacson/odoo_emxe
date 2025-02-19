@@ -180,6 +180,7 @@ class HcTrip(models.Model):
     driver_cost_ids = fields.One2many('hc.trip.amount.detail', 'driver_cost_record_id', string="Các khoản lái xe đã chi", default=_default_driver_cost_ids)
     operation_cost_amount = fields.Float(string="Chi phí vận hành nội bộ", compute='compute_amount_data', store=True)
     driver_salary = fields.Float(string="Lương lái xe", compute='compute_amount_data', store=True)
+    cost_submited = fields.Boolean(string="Đã gửi duyệt chi", default=False)
 
     @api.depends('operation_cost_ids', 'income_detail_ids', 'income_payment_detail_ids', 'cost_detail_ids', 'cost_payment_detail_ids', 'vehicle_type_id', 'vehicle_type_id.driver_salary_percent')
     def compute_amount_data(self):

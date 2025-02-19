@@ -261,15 +261,15 @@ class EMXEFlutterApi(http.Controller):
                 }
             }
 
-    def state_convert(self, state=False):
+    def state_convert(self, state=False, cost_submited=False):
+        if cost_submited:
+            return 4
         if state == 'waiting':
             return 0
         if state == 'processing':
             return 1
-        if state == 'done':
+        if state in ['done', 'payment']:
             return 3
-        if state == 'payment':
-            return 4
 
     @http.route('/emxe_api/get_list_trip', auth='user', csrf=False, type='json')
     def get_list_trip(self, **kw):
@@ -278,27 +278,27 @@ class EMXEFlutterApi(http.Controller):
             date_from = kw.get('date_from')
             if date_from:
                 date_from = datetime.strptime(f'{date_from} 00:00:00', '%d/%m/%Y %H:%M:%S')
-            else:
-                return {
-                    "status": "fail",
-                    "code": 400,
-                    "message": "Thiếu date_from",
-                    "data": {
-                        "success": False
-                    }
-                }
+            # else:
+            #     return {
+            #         "status": "fail",
+            #         "code": 400,
+            #         "message": "Thiếu date_from",
+            #         "data": {
+            #             "success": False
+            #         }
+            #     }
             date_to = kw.get('date_to')
             if date_to:
                 date_to = datetime.strptime(f'{date_to} 23:59:59', '%d/%m/%Y %H:%M:%S')
-            else:
-                return {
-                    "status": "fail",
-                    "code": 400,
-                    "message": "Thiếu date_to",
-                    "data": {
-                        "success": False
-                    }
-                }
+            # else:
+            #     return {
+            #         "status": "fail",
+            #         "code": 400,
+            #         "message": "Thiếu date_to",
+            #         "data": {
+            #             "success": False
+            #         }
+            #     }
             index = kw.get('index')
             if not index:
                 return {
@@ -310,15 +310,15 @@ class EMXEFlutterApi(http.Controller):
                     }
                 }
             offset = kw.get('offset')
-            if offset == None:
-                return {
-                    "status": "fail",
-                    "code": 400,
-                    "message": "Thiếu offset",
-                    "data": {
-                        "success": False
-                    }
-                }
+            # if offset == None:
+            #     return {
+            #         "status": "fail",
+            #         "code": 400,
+            #         "message": "Thiếu offset",
+            #         "data": {
+            #             "success": False
+            #         }
+            #     }
             state = kw.get('state')
             if not state:
                 return {
@@ -329,34 +329,36 @@ class EMXEFlutterApi(http.Controller):
                         "success": False
                     }
                 }
-            odoo_state = []
+            domain = [
+                ('driver_id', 'in', [user.id, False])
+            ]
+            if date_from:
+                domain.append(('start_time', '>=', date_from))
+            if date_to:
+                domain.append(('start_time', '<=', date_to))
             if state == 'all':
-                odoo_state = ['waiting', 'processing', 'payment', 'done']
+                domain.append(('state', 'in', ['waiting', 'processing', 'payment', 'done']))
             elif state == 'ready':
-                odoo_state = ['waiting']
+                domain.append(('state', '=', 'waiting'))
             elif state == 'in_progress ':
-                odoo_state = ['processing']
+                domain.append(('state', '=', 'processing'))
             elif state == 'done':
-                odoo_state = ['done']
+                domain.append(('state', 'in', ['done', 'payment']))
+                domain.append(('cost_submited', '=', False))
             elif state == 'paid':
-                odoo_state = ['payment']
+                domain.append(('cost_submited', '=', True))
 
-            list_trip = request.env['hc.trip'].search([
-                ('start_time', '>=', date_from),
-                ('start_time', '<=', date_to),
-                ('state', 'in', odoo_state),
-                ('driver_id', 'in', [user.id, False]),
-            ], limit=index)
+            list_trip = request.env['hc.trip'].search(domain, limit=index, order='start_time desc')
             result = []
             for trip in list_trip:
                 trip_data = {
                     "id": trip.id,
-                    "name": f"{trip.pick_up_place} - f{trip.destination}",
+                    "name": f"{trip.pick_up_place} - {trip.destination}",
                     "driver_accept": trip.driver_accept,
                     "start_time": trip.start_time,
                     "start_in": trip.pick_up_place,
                     "finish_in": trip.destination,
-                    "state": self.state_convert(trip.state),
+                    "state": self.state_convert(trip.state, trip.cost_submited),
                 }
                 result.append(trip_data)
 
@@ -393,12 +395,12 @@ class EMXEFlutterApi(http.Controller):
 
                     result = {
                         "id": trip.id,
-                        "name": f"{trip.pick_up_place} - f{trip.destination}",
+                        "name": f"{trip.pick_up_place} - {trip.destination}",
                         "driver_accept": trip.driver_accept,
                         "start_time": trip.start_time,
                         "start_in": trip.pick_up_place,
                         "finish_in": trip.destination,
-                        "state": self.state_convert(trip.state),
+                        "state": self.state_convert(trip.state, trip.cost_submited),
                         "payment_status": payment_status,
                         "tour_guide": trip.tour_guide,
                         "phone": trip.driver_phone,
@@ -1134,6 +1136,7 @@ class EMXEFlutterApi(http.Controller):
                         'driver_cost_id': cost_payment_record_id.id,
                         'payment_amount': float(amount),
                     })
+            trip_id.sudo().cost_submited = True
 
             return {
                 'status': 'success',
