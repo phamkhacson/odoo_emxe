@@ -261,15 +261,21 @@ class EMXEFlutterApi(http.Controller):
                 }
             }
 
-    def state_convert(self, state=False, cost_submited=False):
-        if cost_submited:
-            return 4
+    def state_convert(self, state=False, trip=False):
+        if trip.cost_submited:
+            return 6
         if state == 'waiting':
-            return 0
+            if trip.driver_accept:
+                return 2
+            else:
+                return 1
         if state == 'processing':
-            return 1
+            if not trip.trip_pause_time:
+                return 4
+            else:
+                return 3
         if state in ['done', 'payment']:
-            return 3
+            return 5
 
     @http.route('/emxe_api/get_list_trip', auth='user', csrf=False, type='json')
     def get_list_trip(self, **kw):
@@ -358,7 +364,7 @@ class EMXEFlutterApi(http.Controller):
                     "start_time": trip.start_time,
                     "start_in": trip.pick_up_place,
                     "finish_in": trip.destination,
-                    "state": self.state_convert(trip.state, trip.cost_submited),
+                    "state": self.state_convert(trip.state, trip),
                 }
                 result.append(trip_data)
 
@@ -400,7 +406,7 @@ class EMXEFlutterApi(http.Controller):
                         "start_time": trip.start_time,
                         "start_in": trip.pick_up_place,
                         "finish_in": trip.destination,
-                        "state": self.state_convert(trip.state, trip.cost_submited),
+                        "state": self.state_convert(trip.state, trip),
                         "payment_status": payment_status,
                         "tour_guide": trip.tour_guide,
                         "phone": trip.driver_phone,
@@ -1167,7 +1173,9 @@ class EMXEFlutterApi(http.Controller):
                 # driver_advance = sum(trip.cost_payment_detail_ids.filtered(lambda x: x.paid_cost_id.name == 'Tạm ứng cho lái xe').mapped('payment_amount'))
                 # driver_cash_recieved = sum(trip.income_payment_detail_ids.filtered(lambda x: x.payment_income_id.name == 'Lái xe thu tiền').mapped('payment_amount'))
                 transactions.append({
+                    'type': 'debit',
                     'amount': trip.driver_salary,
+                    'datetime': trip.end_time.strftime('%d/%m/%Y %H:%M:%S'),
                     'description': f'Lái xe nhận tiền từ chuyến {trip.hc_code}',
                 })
             return {
