@@ -1175,7 +1175,7 @@ class EMXEFlutterApi(http.Controller):
                 transactions.append({
                     'type': 'debit',
                     'amount': trip.driver_salary,
-                    'datetime': trip.end_time.strftime('%d/%m/%Y %H:%M:%S'),
+                    'datetime': trip.end_time,
                     'description': f'Lái xe nhận tiền từ chuyến {trip.hc_code}',
                 })
             return {
