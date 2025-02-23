@@ -306,15 +306,15 @@ class EMXEFlutterApi(http.Controller):
             #         }
             #     }
             index = kw.get('index')
-            # if not index:
-            #     return {
-            #         "status": "fail",
-            #         "code": 400,
-            #         "message": "Thiếu index",
-            #         "data": {
-            #             "success": False
-            #         }
-            #     }
+            if index == None:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu index",
+                    "data": {
+                        "success": False
+                    }
+                }
             offset = kw.get('offset')
             if offset == None:
                 return {
@@ -354,7 +354,12 @@ class EMXEFlutterApi(http.Controller):
             elif state == 'paid':
                 domain.append(('cost_submited', '=', True))
 
-            list_trip = request.env['hc.trip'].search(domain, limit=offset, order='start_time desc')
+            list_trip = request.env['hc.trip'].search(domain, order='start_time desc')
+            if len(list_trip) > index:
+                list_trip = list_trip[index:index+offset]
+            else:
+                list_trip = request.env['hc.trip']
+
             result = []
             for trip in list_trip:
                 trip_data = {
