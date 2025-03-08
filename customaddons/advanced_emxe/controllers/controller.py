@@ -836,7 +836,7 @@ class EMXEFlutterApi(http.Controller):
                     }
                 }
             bank_acc_id = trip_id.dealer_id.bank_account_ids[0]
-            qr_code = f'https://img.vietqr.io/image/{bank_acc_id.bank_name}-{bank_acc_id.name}-compact2.jpg?amount={amount}%5C&addInfo={trip_id.hc_code}'
+            qr_code = f'https://img.vietqr.io/image/{bank_acc_id.bank_name}-{bank_acc_id.name}-compact2.png?amount={amount}&addInfo={trip_id.hc_code}'
 
             return {
                 'status': 'success',
@@ -1401,6 +1401,85 @@ class EMXEFlutterApi(http.Controller):
                 "code": 200,
                 "message": "success",
                 "data": result
+            }
+        except Exception as e:
+            return {
+                'status': 'fail',
+                'code': 400,
+                'message': e,
+            }
+
+    # api review trip
+    @http.route('/emxe_api/review_trip', auth='user', csrf=False, type='json')
+    def review_trip(self, **kw):
+        try:
+            user = request.env.user
+            params = kw
+            trip_id = params.get('trip_id')
+            trip_rate = params.get('trip_rate')
+            cus_rate = params.get('cus_rate')
+            note = params.get('note')
+            if not trip_id:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu trip_id",
+                    "data": {
+                        "success": False
+                    }
+                }
+            if not trip_rate:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu trip_rate",
+                    "data": {
+                        "success": False
+                    }
+                }
+            if not cus_rate:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu cus_rate",
+                    "data": {
+                        "success": False
+                    }
+                }
+            trip = request.env['hc.trip'].search([('id', '=', trip_id)])
+            if not trip:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Không tìm thấy chuyến xe",
+                    "data": {
+                        "success": False
+                    }
+                }
+            if not trip.transport_vendor_id:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Chuyến xe chưa có nhà xe",
+                    "data": {
+                        "success": False
+                    }
+                }
+            review = request.env['hc.vendor.review'].create({
+                'vendor_id': trip.transport_vendor_id.id,
+                'trip_id': trip.id,
+                'driver_id': user.id,
+                'trip_rate': trip_rate,
+                'cus_rate': cus_rate,
+                'note': note,
+            })
+            return {
+                "status": "success",
+                "code": 200,
+                "message": "Cập nhật thành công",
+                "data": {
+                    "success": True
+                }
             }
         except Exception as e:
             return {

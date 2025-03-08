@@ -15,7 +15,16 @@ class HcTransportVendor(models.Model):
     owner_id = fields.Many2one('res.users', string="Chủ nhà xe")
     owner_identification_number = fields.Char(string="Số CMND chủ nhà xe")
     vehicle_ids = fields.One2many('hc.vehicle', 'own_vehicle_id', string="Danh sách xe")
-    review_point = fields.Float(string="Điểm đánh giá")
+    review_point = fields.Float(string="Điểm đánh giá", compute='_compute_review_point', store=True)
+    review_ids = fields.One2many('hc.vendor.review', 'vendor_id', string="Đánh giá")
+
+    @api.depends('review_ids', 'review_ids.trip_rate')
+    def _compute_review_point(self):
+        for rec in self:
+            if rec.review_ids:
+                rec.review_point = sum(rec.review_ids.mapped('trip_rate')) / len(rec.review_ids)
+            else:
+                rec.review_point = 0
 
     def unlink(self):
         for rec in self:

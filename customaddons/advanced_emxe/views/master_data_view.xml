@@ -160,6 +160,15 @@
                                     <field name="driver_id"/>
                                 </tree>
                             </field>
+                            <field name="review_ids" readonly="1">
+                                <tree>
+                                    <field name="driver_id"/>
+                                    <field name="trip_id"/>
+                                    <field name="trip_rate"/>
+                                    <field name="cus_rate"/>
+                                    <field name="note"/>
+                                </tree>
+                            </field>
                         </group>
                     </sheet>
                 </form>
