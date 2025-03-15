@@ -26,6 +26,10 @@ class HcTripAmountDetail(models.Model):
     driver_cost_record_id = fields.Many2one('hc.trip')
     operation_cost_price = fields.Float(string="Số tiền")
     img_note = fields.Binary('Hình ảnh')
+    payer = fields.Selection([
+        ('driver', 'Tài xế'),
+        ('driver_advance', 'Tài xế tạm ứng'),
+    ], string="Người trả", default='driver')
 
     def _compute_amount(self):
         for rec in self:

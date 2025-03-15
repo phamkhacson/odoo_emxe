@@ -181,6 +181,7 @@ class HcTrip(models.Model):
     operation_cost_amount = fields.Float(string="Chi phí vận hành nội bộ", compute='compute_amount_data', store=True)
     driver_salary = fields.Float(string="Lương lái xe", compute='compute_amount_data', store=True)
     cost_submited = fields.Boolean(string="Đã gửi duyệt chi", default=False)
+    locate_list = fields.Char(string="Danh sách định vị", default="[]")
 
     @api.depends('operation_cost_ids', 'income_detail_ids', 'income_payment_detail_ids', 'cost_detail_ids', 'cost_payment_detail_ids', 'vehicle_type_id', 'vehicle_type_id.driver_salary_percent')
     def compute_amount_data(self):

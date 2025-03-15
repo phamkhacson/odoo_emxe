@@ -408,6 +408,7 @@
                                 <field name="destination" readonly="0"/>
                                 <field name="note"/>
                                 <field name="oil_cost"/>
+                                <field name="locate_list"/>
                             </group>
                             <group groups="advanced_emxe.hc_group_accountant,base.group_system">
                                 <field name="customer_amount"/>

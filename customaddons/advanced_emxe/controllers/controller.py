@@ -4,6 +4,30 @@ from odoo import fields, models, api
 from odoo.http import request, _logger
 from datetime import datetime, timedelta
 import logging
+import math
+import requests
+
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(
+        dlon / 2) * math.sin(dlon / 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    d = R * c
+    return round(d, 2)
+
+# function to calculate distance by real road map with google api
+def get_distance(lat1, lon1, lat2, lon2):
+    try:
+        url = f"https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins={lat1},{lon1}&destinations={lat2},{lon2}&key=AIzaSyDJbwAif54Z_iKJwyo5hzBUbWbIo0n-Na0"
+        response = requests.get(url)
+        data = response.json()
+        distance = data['rows'][0]['elements'][0]['distance']['value']
+        return distance
+    except Exception as e:
+        return 0
 
 
 class EMXEFlutterApi(http.Controller):
@@ -271,9 +295,9 @@ class EMXEFlutterApi(http.Controller):
                 return 1
         if state == 'processing':
             if not trip.trip_pause_time:
-                return 4
-            else:
                 return 3
+            else:
+                return 4
         if state in ['done', 'payment']:
             return 5
 
@@ -962,24 +986,24 @@ class EMXEFlutterApi(http.Controller):
                     res_model_id = request.env['ir.model'].sudo().search([('model', '=', 'hc.trip')],
                                                                          limit=1).id
                     activity_id = request.env.ref('mail.mail_activity_data_todo').id
-                    driver_advance = 0
-                    payment_driver_advance_id = request.env['hc.trip.entry.config'].search(
-                        [('name', '=', 'Tạm ứng cho lái xe')], limit=1)
-                    if payment_driver_advance_id:
-                        driver_advance = sum(trip.cost_payment_detail_ids.filtered(
-                            lambda x: x.paid_cost_id == payment_driver_advance_id).mapped('payment_amount'))
-                    else:
-                        da_existed_activity = request.env['mail.activity'].search(
-                            [('res_model_id', '=', res_model_id), ('res_id', '=', trip.id), ('summary', '=',
-                                                                                             'Thiếu cấu hình loại chi phí Tạm ứng cho lái xe. Admin vui lòng kiểm tra lại.')])
-                        if not da_existed_activity:
-                            request.env['mail.activity'].sudo().create({
-                                'activity_type_id': activity_id,
-                                'user_id': 2,
-                                'res_id': trip.id,
-                                'res_model_id': res_model_id,
-                                'summary': 'Thiếu cấu hình loại chi phí Tạm ứng cho lái xe. Admin vui lòng kiểm tra lại.',
-                            })
+                    # driver_advance = 0
+                    # payment_driver_advance_id = request.env['hc.trip.entry.config'].search(
+                    #     [('name', '=', 'Tạm ứng cho lái xe')], limit=1)
+                    # if payment_driver_advance_id:
+                    #     driver_advance = sum(trip.cost_payment_detail_ids.filtered(
+                    #         lambda x: x.paid_cost_id == payment_driver_advance_id).mapped('payment_amount'))
+                    # else:
+                    #     da_existed_activity = request.env['mail.activity'].search(
+                    #         [('res_model_id', '=', res_model_id), ('res_id', '=', trip.id), ('summary', '=',
+                    #                                                                          'Thiếu cấu hình loại chi phí Tạm ứng cho lái xe. Admin vui lòng kiểm tra lại.')])
+                    #     if not da_existed_activity:
+                    #         request.env['mail.activity'].sudo().create({
+                    #             'activity_type_id': activity_id,
+                    #             'user_id': 2,
+                    #             'res_id': trip.id,
+                    #             'res_model_id': res_model_id,
+                    #             'summary': 'Thiếu cấu hình loại chi phí Tạm ứng cho lái xe. Admin vui lòng kiểm tra lại.',
+                    #         })
                     payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', 'Lái xe thu tiền')],
                                                                                    limit=1)
                     driver_cash_recieved = 0
@@ -998,6 +1022,36 @@ class EMXEFlutterApi(http.Controller):
                                 'res_model_id': res_model_id,
                                 'summary': 'Thiếu cấu hình loại chi phí Lái xe thu tiền. Admin vui lòng kiểm tra lại.',
                             })
+
+                    costs = []
+                    cost_codes = {
+                        'an_uong': 'Ăn',
+                        'luu_tru': 'Ngủ',
+                        'nuoc_uong': 'Nước',
+                        'cao_toc': 'Cao tốc',
+                        'ben_bai': 'Bến bãi',
+                        'rua_xe': 'Rửa xe',
+                        'tip': 'Tip',
+                        'sua_chua': 'Sửa chữa',
+                        'taxi_hdv': 'Taxi HDV',
+                    }
+                    for key in cost_codes.keys():
+                        cost = sum(trip.driver_cost_ids.filtered(
+                            lambda x: x.driver_cost_id.name == cost_codes[key]).mapped('payment_amount'))
+                        if cost:
+                            payer = trip.driver_cost_ids.filtered(
+                                lambda x: x.driver_cost_id.name == cost_codes[key])[0].payer
+                            costs.append({
+                                "type": key,
+                                "amount": cost,
+                                "payer": payer
+                            })
+                    driver_pay = sum(trip.driver_cost_ids.filtered(
+                        lambda x: x.payer == 'driver').mapped('payment_amount'))
+
+                    driver_advance = sum(trip.driver_cost_ids.filtered(
+                        lambda x: x.payer == 'driver_advance').mapped('payment_amount'))
+
                     result = {
                         "id": trip.id,
                         "name": f"{trip.pick_up_place} - {trip.destination}",
@@ -1008,6 +1062,8 @@ class EMXEFlutterApi(http.Controller):
                         "end_time": trip.end_time_actual,
                         "trip_distance": trip.distance_actual,
                         "time_total": trip.total_time_actual,
+                        "costs": costs,
+                        "driver_pay": driver_pay,
                         "driver_advance": driver_advance,
                         "driver_cash_recieved": driver_cash_recieved,
                     }
@@ -1109,44 +1165,53 @@ class EMXEFlutterApi(http.Controller):
                             "success": False
                         }
                     }
-                if cost['payer'] == 'driver':
-                    cost_codes = {
-                        'an_uong': 'Ăn',
-                        'luu_tru': 'Ngủ',
-                        'nuoc_uong': 'Nước',
-                        'cao_toc': 'Cao tốc',
-                        'ben_bai': 'Bến bãi',
-                        'rua_xe': 'Rửa xe',
-                        'tip': 'Tip',
-                        'sua_chua': 'Sửa chữa',
-                        'taxi_hdv': 'Taxi HDV',
-                    }
-                    cost_name = cost_codes[cost['type']]
-                    cost_payment_record_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)],
-                                                                                        limit=1)
-                    if not cost_payment_record_id:
-                        activity_id = request.env.ref('mail.mail_activity_data_todo').id
-                        request.env['mail.activity'].sudo().create({
-                            'activity_type_id': activity_id,
-                            'user_id': 2,
-                            'res_id': trip_id.id,
-                            'res_model_id': request.env['ir.model'].sudo().search([('model', '=', 'hc.trip')],
-                                                                                  limit=1).id,
-                            'summary': f'Thiếu cấu hình loại chi phí {cost_name}. Admin vui lòng kiểm tra lại.',
-                        })
-                        return {
-                            "status": "fail",
-                            "code": 400,
-                            "message": f"Chưa cấu hình loại doanh thu {cost_name}",
-                            "data": {
-                                "success": False
-                            }
+                if payer not in ['driver', 'driver_advance']:
+                    return {
+                        "status": "fail",
+                        "code": 400,
+                        "message": "Payer chỉ nhận 2 giá trị là driver hoặc driver_advance",
+                        "data": {
+                            "success": False
                         }
-                    payment_id = request.env['hc.trip.amount.detail'].create({
-                        'driver_cost_record_id': trip_id.id,
-                        'driver_cost_id': cost_payment_record_id.id,
-                        'payment_amount': float(amount),
+                    }
+                cost_codes = {
+                    'an_uong': 'Ăn',
+                    'luu_tru': 'Ngủ',
+                    'nuoc_uong': 'Nước',
+                    'cao_toc': 'Cao tốc',
+                    'ben_bai': 'Bến bãi',
+                    'rua_xe': 'Rửa xe',
+                    'tip': 'Tip',
+                    'sua_chua': 'Sửa chữa',
+                    'taxi_hdv': 'Taxi HDV',
+                }
+                cost_name = cost_codes[cost['type']]
+                cost_payment_record_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)],
+                                                                                    limit=1)
+                if not cost_payment_record_id:
+                    activity_id = request.env.ref('mail.mail_activity_data_todo').id
+                    request.env['mail.activity'].sudo().create({
+                        'activity_type_id': activity_id,
+                        'user_id': 2,
+                        'res_id': trip_id.id,
+                        'res_model_id': request.env['ir.model'].sudo().search([('model', '=', 'hc.trip')],
+                                                                              limit=1).id,
+                        'summary': f'Thiếu cấu hình loại chi phí {cost_name}. Admin vui lòng kiểm tra lại.',
                     })
+                    return {
+                        "status": "fail",
+                        "code": 400,
+                        "message": f"Chưa cấu hình loại doanh thu {cost_name}",
+                        "data": {
+                            "success": False
+                        }
+                    }
+                payment_id = request.env['hc.trip.amount.detail'].create({
+                    'driver_cost_record_id': trip_id.id,
+                    'driver_cost_id': cost_payment_record_id.id,
+                    'payment_amount': float(amount),
+                    'payer': cost['payer']
+                })
             trip_id.sudo().cost_submited = True
 
             return {
@@ -1479,6 +1544,78 @@ class EMXEFlutterApi(http.Controller):
                 "message": "Cập nhật thành công",
                 "data": {
                     "success": True
+                }
+            }
+        except Exception as e:
+            return {
+                'status': 'fail',
+                'code': 400,
+                'message': e,
+            }
+
+    @http.route('/emxe_api/gps_position', auth='user', csrf=False, type='json')
+    def gps_position(self, **kw):
+        try:
+            user = request.env.user
+            params = kw
+            trip_id = params.get('trip_id')
+            latitude = params.get('latitude')
+            longitude = params.get('longitude')
+            if not trip_id:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu trip_id",
+                    "data": {
+                        "success": False
+                    }
+                }
+            if not latitude:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu latitude",
+                    "data": {
+                        "success": False
+                    }
+                }
+            if not longitude:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu longitude",
+                    "data": {
+                        "success": False
+                    }
+                }
+            trip = request.env['hc.trip'].search([('id', '=', trip_id)])
+            if not trip:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Không tìm thấy chuyến xe",
+                    "data": {
+                        "success": False
+                    }
+                }
+            locate_list = eval(trip.locate_list) if trip.locate_list else []
+            last_distance = 0
+            if len(locate_list) > 0:
+                last_locate = locate_list[-1]
+                last_distance = haversine(last_locate['latitude'], last_locate['longitude'], latitude, longitude)
+            locate_list.append({
+                'latitude': latitude,
+                'longitude': longitude,
+            })
+            trip.locate_list = str(locate_list)
+
+            return {
+                "status": "success",
+                "code": 200,
+                "message": "Cập nhật thành công",
+                "data": {
+                    "success": True,
+                    "last_distance": last_distance
                 }
             }
         except Exception as e:
