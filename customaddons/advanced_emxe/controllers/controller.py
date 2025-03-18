@@ -286,6 +286,8 @@ class EMXEFlutterApi(http.Controller):
             }
 
     def state_convert(self, state=False, trip=False):
+        if state == 'done':
+            return 7
         if trip.cost_submited:
             return 6
         if state == 'waiting':
@@ -298,7 +300,7 @@ class EMXEFlutterApi(http.Controller):
                 return 3
             else:
                 return 4
-        if state in ['done', 'payment']:
+        if state == 'payment':
             return 5
 
     @http.route('/emxe_api/get_list_trip', auth='user', csrf=False, type='json')
@@ -373,10 +375,10 @@ class EMXEFlutterApi(http.Controller):
             elif state == 'in_progress ':
                 domain.append(('state', '=', 'processing'))
             elif state == 'done':
-                domain.append(('state', 'in', ['done', 'payment']))
+                domain.append(('state', 'in', ['payment']))
                 domain.append(('cost_submited', '=', False))
             elif state == 'paid':
-                domain.append(('cost_submited', '=', True))
+                domain.append('|', ('state', '=', 'done'), ('cost_submited', '=', True))
 
             list_trip = request.env['hc.trip'].search(domain, order='start_time desc')
             if len(list_trip) > index:
@@ -1034,6 +1036,7 @@ class EMXEFlutterApi(http.Controller):
                         'tip': 'Tip',
                         'sua_chua': 'Sửa chữa',
                         'taxi_hdv': 'Taxi HDV',
+                        'khac': 'Khác',
                     }
                     for key in cost_codes.keys():
                         cost = sum(trip.driver_cost_ids.filtered(
@@ -1066,6 +1069,7 @@ class EMXEFlutterApi(http.Controller):
                         "driver_pay": driver_pay,
                         "driver_advance": driver_advance,
                         "driver_cash_recieved": driver_cash_recieved,
+                        "note": trip.cost_note,
                     }
                     return {
                         'status': 'success',
@@ -1156,6 +1160,9 @@ class EMXEFlutterApi(http.Controller):
                         }
                     }
                 payer = cost.get('payer')
+                cost_note = cost.get('note')
+                if cost_note:
+                    trip.cost_note = cost_note
                 if not payer:
                     return {
                         "status": "fail",
@@ -1184,6 +1191,7 @@ class EMXEFlutterApi(http.Controller):
                     'tip': 'Tip',
                     'sua_chua': 'Sửa chữa',
                     'taxi_hdv': 'Taxi HDV',
+                    'khac': 'Khác',
                 }
                 cost_name = cost_codes[cost['type']]
                 cost_payment_record_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)],
@@ -1206,6 +1214,9 @@ class EMXEFlutterApi(http.Controller):
                             "success": False
                         }
                     }
+                existed_cost = trip_id.driver_cost_ids.filtered(lambda x: x.driver_cost_id == cost_payment_record_id)
+                if existed_cost:
+                    existed_cost.unlink()
                 payment_id = request.env['hc.trip.amount.detail'].create({
                     'driver_cost_record_id': trip_id.id,
                     'driver_cost_id': cost_payment_record_id.id,
@@ -1600,12 +1611,15 @@ class EMXEFlutterApi(http.Controller):
                 }
             locate_list = eval(trip.locate_list) if trip.locate_list else []
             last_distance = 0
-            if len(locate_list) > 0:
-                last_locate = locate_list[-1]
-                last_distance = haversine(last_locate['latitude'], last_locate['longitude'], latitude, longitude)
+            for i in range(len(locate_list)):
+                if not locate_list[len(locate_list) - i]['is_pause']:
+                    last_locate = locate_list[len(locate_list) - i]
+                    last_distance = haversine(last_locate['latitude'], last_locate['longitude'], latitude, longitude)
+                    break
             locate_list.append({
                 'latitude': latitude,
                 'longitude': longitude,
+                'is_pause': True if trip.trip_pause_time else False,
             })
             trip.locate_list = str(locate_list)
 
@@ -1625,3 +1639,28 @@ class EMXEFlutterApi(http.Controller):
                 'message': e,
             }
 
+    # get list vehicle
+    @http.route('/emxe_api/get_vehicle_list', auth='user', csrf=False, type='json')
+    def get_vehicle_list(self, **kw):
+        try:
+            user = request.env.user
+            vehicle_list = request.env['hc.vehicle'].search([('driver_id', '=', user.id)])
+            result = []
+            for vehicle in vehicle_list:
+                result.append({
+                    'number': vehicle.license_plate,
+                    'type': vehicle.type.name if vehicle.type else '',
+                    'vendor': vehicle.own_vehicle_id.name if vehicle.own_vehicle_id else '',
+                })
+            return {
+                "status": "success",
+                "code": 200,
+                "message": "success",
+                "data": result
+            }
+        except Exception as e:
+            return {
+                'status': 'fail',
+                'code': 400,
+                'message': e,
+            }

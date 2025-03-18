@@ -6,6 +6,18 @@ from datetime import datetime, timedelta
 
 from odoo.exceptions import UserError
 
+import math
+
+def haversine(lat1, lon1, lat2, lon2):
+    R = 6371
+    dlat = math.radians(lat2 - lat1)
+    dlon = math.radians(lon2 - lon1)
+    a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(
+        dlon / 2) * math.sin(dlon / 2)
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    d = R * c
+    return round(d, 2)
+
 
 class HcTrip(models.Model):
     _name = 'hc.trip'
@@ -16,6 +28,7 @@ class HcTrip(models.Model):
     start_time = fields.Datetime(string="Khởi hành lúc")
     end_time = fields.Datetime(string="Kết thúc lúc")
     note = fields.Char(string="Ghi chú")
+    cost_note = fields.Char(string="Ghi chú chi phí")
     auction_ids = fields.One2many('hc.trip.auction.history', 'trip_id', string="Đấu giá")
     auction_count = fields.Integer(string="Số lượng đấu giá", compute="_compute_auction_count", store=True)
     customer_code = fields.Char(string="Mã khách hàng cung cấp")
@@ -53,8 +66,20 @@ class HcTrip(models.Model):
     trip_pause_time = fields.Datetime('Thời điểm tạm dừng')
     pause_time_count = fields.Integer('Thời gian tạm dừng chuyến')
     total_time_actual = fields.Integer('Thời gian di chuyển thực tế', compute="compute_total_time_actual", store=True)
-    distance_actual = fields.Float('Quãng đường thực tế')
+    distance_actual = fields.Float('Quãng đường thực tế', compute="compute_distance_actual", store=True)
     batch_id = fields.Many2one('hc.trip.batch', 'Chuyến gộp')
+
+    @api.depends('locate_list')
+    def compute_distance_actual(self):
+        for rec in self:
+            distance_actual = 0
+            if rec.locate_list:
+                locate_list = eval(rec.locate_list)
+                if len(locate_list) > 1:
+                    for i in range(1, len(locate_list)):
+                        if not locate_list[i-1]['is_pause']:
+                            distance_actual += haversine(locate_list[i-1]['latitude'], locate_list[i-1]['longitude'], locate_list[i]['latitude'], locate_list[i]['longitude'])
+            rec.distance_actual = distance_actual
 
     def unlink(self):
         for rec in self:
@@ -424,7 +449,7 @@ class HcTrip(models.Model):
             }
             notification = {
                 'title': 'Chuyến đi sắp tới',
-                'body': f'Chuyến đi sắp khởi hành từ {pick_up_place} - {destination} vào lúc {rec.start_time.strftime("%d/%m/%Y %H:%M:%S")}.'
+                'body': f'Chuyến đi sắp khởi hành từ {pick_up_place} - {destination} vào lúc {trip.start_time.strftime("%d/%m/%Y %H:%M:%S")}.'
             }
             self.env['emxe.firebase.config'].sudo().send_fcm_notification(data=data, notification=notification,
-                                                                          user_id=rec.driver_id)
+                                                                          user_id=trip.driver_id)
