@@ -18,3 +18,4 @@ class HcOilManagement(models.Model):
     vehicle_id = fields.Many2one('hc.vehicle', string="Xe")
     mtt = fields.Char(string="MTT")
     user_id = fields.Many2one('res.users', string="Người nhập")
+    image = fields.Binary(string="Hình ảnh")

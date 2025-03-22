@@ -82,6 +82,7 @@
                             <field name="type"/>
                             <field name="own_vehicle_id"/>
                             <field name="driver_id"/>
+                            <field name="fuel_consumption"/>
                             <field name="process_trip_id"/>
                         </group>
                     </sheet>

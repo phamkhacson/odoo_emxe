@@ -13,3 +13,4 @@ class HcRepairManagement(models.Model):
     vehicle_id = fields.Many2one('hc.vehicle', string="Xe")
     note = fields.Char(string="Ghi chú")
     user_id = fields.Many2one('res.users', string="Người nhập")
+    image = fields.Binary(string="Hình ảnh")

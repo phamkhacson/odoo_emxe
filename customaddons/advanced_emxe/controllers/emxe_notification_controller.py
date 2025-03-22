@@ -51,13 +51,19 @@ class EMXENotificationController(http.Controller):
                 else:
                     reg.sudo().write({'user_id': user.id})
                 return {
-                    'success': True,
+                    "status": "success",
+                    "code": 200,
+                    "message": "Đăng ký thành công",
+                    "data": {
+                        "success": True
+                    }
                 }
         except Exception as e:
             _create_flutter_log(request.env, name='add_registration_id', description=str(e), type='error')
             return {
-                'success': False,
-                'error': str(e)
+                'status': 'fail',
+                'code': 400,
+                'message': e,
             }
 
     @http.route('/emxe_api/get_notification_message', auth='user', csrf=False, type='json')
@@ -78,22 +84,26 @@ class EMXENotificationController(http.Controller):
                         val = {
                             'create_on': mess.create_date,
                             'message_id': mess.id,
+                            'type': 'payment' if 'của bạn đã được hoàn thành' in mess.body else 'trip',
                             'message_name': 'Thông báo',
                             'message_body': strip_html_tags(mess.body) if mess.body else None,
                             'res_id': mess.res_id,
                         }
                         message_list.append(val)
             return {
-                'success': True,
-                'result': message_list
+                "status": "success",
+                "code": 200,
+                "message": "success",
+                "data": message_list
             }
 
 
         except Exception as e:
             _create_flutter_log(request.env, name='get_notification_message', description=str(e), type='error')
             return {
-                'success': False,
-                'error': str(e)
+                'status': 'fail',
+                'code': 400,
+                'message': e,
             }
 
 

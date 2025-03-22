@@ -270,17 +270,17 @@ class HcTrip(models.Model):
                 tour_guide = rec.tour_guide if rec.tour_guide else ''
                 tour_guide_phone = rec.tour_guide_phone if rec.tour_guide_phone else ''
                 note = rec.note if rec.note else ''
-                message = ('Bạn được phân công chuyến với mã: ' + hc_code + '<br>' +
-                           'Điểm đón khách: ' + pick_up_place + '<br>' +
-                           'Điểm trả khách: ' + destination + '<br>' +
-                           'Khởi hành: ' + start_time + '<br>' +
-                           'Kết thúc: ' + end_time + '<br>' +
-                           'Loại xe: ' + vehicle_type_id + '<br>' +
-                           'Nhà xe: ' + transport_vendor_id + '<br>' +
-                           'Xe: ' + license_plate + '<br>' +
-                           'Tài xế: ' + rec.driver_id.name + '<br>' +
-                           'Hướng dẫn viên: ' + tour_guide + '<br>' +
-                           'SĐT hướng dẫn viên: ' + tour_guide_phone + '<br>' +
+                message = ('Bạn được phân công chuyến với mã: ' + hc_code + ' <br>' +
+                           'Điểm đón khách: ' + pick_up_place + ' <br>' +
+                           'Điểm trả khách: ' + destination + ' <br>' +
+                           'Khởi hành: ' + start_time + ' <br>' +
+                           'Kết thúc: ' + end_time + ' <br>' +
+                           'Loại xe: ' + vehicle_type_id + ' <br>' +
+                           'Nhà xe: ' + transport_vendor_id + ' <br>' +
+                           'Xe: ' + license_plate + ' <br>' +
+                           'Tài xế: ' + rec.driver_id.name + ' <br>' +
+                           'Hướng dẫn viên: ' + tour_guide + ' <br>' +
+                           'SĐT hướng dẫn viên: ' + tour_guide_phone + ' <br>' +
                            'Ghi chú: ' + note
                            )
                 rec.message_post(body=message, message_type='notification', partner_ids=[rec.driver_id.partner_id.id])
@@ -307,6 +307,9 @@ class HcTrip(models.Model):
             rec.sudo().state = 'payment'
             pick_up_place = rec.pick_up_place if rec.pick_up_place else ''
             destination = rec.destination if rec.destination else ''
+
+            message = (f'Chuyến đi {pick_up_place} - {destination} của bạn đã được hoàn thành. Vào trang báo cáo để hoàn thiện chi phí chuyến đi.')
+            rec.message_post(body=message, message_type='notification', partner_ids=[rec.driver_id.partner_id.id])
             data = {
                 'record_id': rec.id,
                 'type': 'noti'
@@ -324,6 +327,9 @@ class HcTrip(models.Model):
             rec.sudo().state = 'done'
             pick_up_place = rec.pick_up_place if rec.pick_up_place else ''
             destination = rec.destination if rec.destination else ''
+            message = (
+                f'Chuyến đi {pick_up_place} - {destination} của bạn đã được thanh toán. Xem chi tiết ở trang cá nhân')
+            rec.message_post(body=message, message_type='notification', partner_ids=[rec.driver_id.partner_id.id])
             data = {
                 'record_id': rec.id,
                 'type': 'noti'

@@ -1163,7 +1163,7 @@ class EMXEFlutterApi(http.Controller):
                 payer = cost.get('payer')
                 cost_note = cost.get('note')
                 if cost_note:
-                    trip.cost_note = cost_note
+                    trip_id.cost_note = cost_note
                 if not payer:
                     return {
                         "status": "fail",
@@ -1287,7 +1287,6 @@ class EMXEFlutterApi(http.Controller):
             amount = params.get('amount')
             unit_cost = params.get('unit_cost')
             oil_size = params.get('oil_size')
-            fuel_consumption = params.get('fuel_consumption')
             odo = params.get('odo')
             if not vehicle_no:
                 return {
@@ -1325,10 +1324,8 @@ class EMXEFlutterApi(http.Controller):
                         "success": False
                     }
                 }
-            if not fuel_consumption:
-                fuel_consumption = 0
             if not odo:
-                odoo = 0
+                odo = 0
             vehicle = request.env['hc.vehicle'].search([('license_plate', '=', vehicle_no)])
             if not vehicle:
                 return {
@@ -1345,6 +1342,7 @@ class EMXEFlutterApi(http.Controller):
                 'price': unit_cost,
                 'liter': oil_size,
                 'date': datetime.today(),
+                'start_km': odo,
                 'user_id': user.id,
             })
             return {
@@ -1656,6 +1654,7 @@ class EMXEFlutterApi(http.Controller):
                     'number': vehicle.license_plate,
                     'type': vehicle.type.name if vehicle.type else '',
                     'vendor': vehicle.own_vehicle_id.name if vehicle.own_vehicle_id else '',
+                    'fuel_consumption': vehicle.fuel_consumption,
                 })
             return {
                 "status": "success",
