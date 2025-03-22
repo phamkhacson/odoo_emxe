@@ -378,8 +378,9 @@ class EMXEFlutterApi(http.Controller):
                 domain.append(('state', 'in', ['payment']))
                 domain.append(('cost_submited', '=', False))
             elif state == 'paid':
-                domain.append('|', ('state', '=', 'done'), ('cost_submited', '=', True))
-
+                domain.append('|')
+                domain.append(('state', '=', 'done'))
+                domain.append(('cost_submited', '=', True))
             list_trip = request.env['hc.trip'].search(domain, order='start_time desc')
             if len(list_trip) > index:
                 list_trip = list_trip[index:index+offset]
@@ -1366,7 +1367,9 @@ class EMXEFlutterApi(http.Controller):
     def get_oil_refill_list(self, **kw):
         try:
             user = request.env.user
-            oil_refill_list = request.env['hc.oil.management'].search([('user_id', '=', user.id)], order='date desc')
+            offset = kw.get('index') if kw.get('index') else 0
+            limit = kw.get('offset') if kw.get('offset') else 80
+            oil_refill_list = request.env['hc.oil.management'].search([('user_id', '=', user.id)], offset=offset, limit=limit, order='date desc')
             result = []
             for oil_refill in oil_refill_list:
                 result.append({
@@ -1462,7 +1465,9 @@ class EMXEFlutterApi(http.Controller):
     def get_repair_vehicle_list(self, **kw):
         try:
             user = request.env.user
-            repair_vehicle_list = request.env['hc.repair.management'].search([('user_id', '=', user.id)],
+            offset = kw.get('index') if kw.get('index') else 0
+            limit = kw.get('offset') if kw.get('offset') else 80
+            repair_vehicle_list = request.env['hc.repair.management'].search([('user_id', '=', user.id)], offset=offset, limit=limit,
                                                                              order='date desc')
             result = []
             for repair_vehicle in repair_vehicle_list:
