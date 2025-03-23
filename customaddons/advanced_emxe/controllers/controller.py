@@ -45,38 +45,51 @@ class EMXEFlutterApi(http.Controller):
             type = kw.get('type')
             if not type:
                 return {
-                    'status': 'fail',
-                    'code': 400,
-                    'message': 'Thiếu type'
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu type",
+                    "data": {
+                        "success": False
+                    }
                 }
             if type == 'gmail':
                 if '@gmail.com' in user:
                     otp = request.env['hc.otp'].sudo().generate_otp(user)
                     otp.send_notify_to_user()
                     return {
-                        "jsonrpc": "2.0",
-                        "result": {
-                            "success": True,
+                        "status": "success",
+                        "code": 200,
+                        "message": "Gửi thành công",
+                        "data": {
+                            "success": True
                         }
                     }
                 else:
                     return {
-                        'status': 'fail',
-                        'code': 400,
-                        'message': 'User không phải là email'
+                        "status": "fail",
+                        "code": 400,
+                        "message": "User không phải là email",
+                        "data": {
+                            "success": False
+                        }
                     }
             else:
                 return {
-                    'status': 'fail',
-                    'code': 400,
-                    'message': 'User không phải là email'
+                    "status": "fail",
+                    "code": 400,
+                    "message": "User không phải là email",
+                    "data": {
+                        "success": False
+                    }
                 }
         except Exception as e:
             return {
-                'status': 'fail',
-                'code': 400,
-                'message': e,
-
+                "status": "fail",
+                "code": 400,
+                "message": e,
+                "data": {
+                    "success": False
+                }
             }
 
     # api submit otp
@@ -86,51 +99,71 @@ class EMXEFlutterApi(http.Controller):
             user = kw.get('user')
             if not user:
                 return {
-                    'status': 'fail',
-                    'code': 400,
-                    'message': 'Thiếu user'
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu user",
+                    "data": {
+                        "success": False
+                    }
                 }
             otp = kw.get('otp')
             if not otp:
                 return {
-                    'status': 'fail',
-                    'code': 400,
-                    'message': 'Thiếu otp'
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu OTP",
+                    "data": {
+                        "success": False
+                    }
                 }
             otp_id = request.env['hc.otp'].sudo().search([('user', '=', user), ('otp', '=', otp)])
             if otp_id:
                 if otp_id.expired < datetime.now():
                     return {
-                        'status': 'fail',
-                        'code': 400,
-                        'message': 'OTP hết hạn'
+                        "status": "fail",
+                        "code": 400,
+                        "message": "OTP hết hạn",
+                        "data": {
+                            "success": False
+                        }
                     }
                 else:
                     if otp_id.state == 'new':
                         otp_id.state = 'used'
                         return {
-                            'status': 'success',
-                            'code': 200,
-                            'message': 'OTP chính xác'
+                            "status": "success",
+                            "code": 200,
+                            "message": "OTP chính xác",
+                            "data": {
+                                "success": True
+                            }
                         }
                     else:
                         return {
-                            'status': 'fail',
-                            'code': 400,
-                            'message': 'OTP đã được sử dụng'
+                            "status": "fail",
+                            "code": 400,
+                            "message": "OTP đã được sử dụng",
+                            "data": {
+                                "success": False
+                            }
                         }
             else:
                 return {
-                    'status': 'fail',
-                    'code': 400,
-                    'message': 'OTP không chính xác'
+                    "status": "fail",
+                    "code": 400,
+                    "message": "OTP không chính xác",
+                    "data": {
+                        "success": False
+                    }
                 }
         except Exception as e:
             return {
-                'status': 'fail',
-                'code': 400,
-                'message': e,
-
+                "status": "fail",
+                "code": 400,
+                "message": e,
+                "data": {
+                    "success": False
+                }
             }
 
     @http.route('/emxe_api/get_employee_profile', auth='user', csrf=False, type='json')
@@ -161,16 +194,21 @@ class EMXEFlutterApi(http.Controller):
                 }
             else:
                 return {
-                    'success': 'fail',
-                    'code': 400,
-                    'message': 'Employee not found'
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Employee not found",
+                    "data": {
+                        "success": False
+                    }
                 }
         except Exception as e:
             return {
-                'status': 'fail',
-                'code': 400,
-                'message': e,
-
+                "status": "fail",
+                "code": 400,
+                "message": e,
+                "data": {
+                    "success": False
+                }
             }
 
     @http.route('/emxe_api/update_employee_profile', auth='user', csrf=False, type='json')
@@ -252,7 +290,8 @@ class EMXEFlutterApi(http.Controller):
                 }
             check_pass = False
             try:
-                request.session.authenticate('emxe', user.login, current_password)
+                db = request.env['ir.config_parameter'].sudo().get_param('odoo.database', 'odoo_emxe')
+                request.session.authenticate(db, user.login, current_password)
                 check_pass = True
             except Exception as ex:
                 check_pass = False
