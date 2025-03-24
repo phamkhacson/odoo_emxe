@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <menuitem id="hc_data_menu_accountant" name="Kế toán" sequence="5"/>
+        <menuitem id="hc_data_menu_accountant" name="Kế toán" sequence="5" groups="advanced_emxe.hc_group_admin,advanced_emxe.hc_group_operator,advanced_emxe.hc_group_vehicle_owner"/>
         <record id="hc_trip_view_accountant_action" model="ir.actions.act_window">
             <field name="name">Hạch toán</field>
             <field name="type">ir.actions.act_window</field>
@@ -67,7 +67,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
-                            <field name="type_id"/>
+                            <field name="type_id" options="{'no_open': True}"/>
                             <field name="note"/>
                         </group>
                     </sheet>

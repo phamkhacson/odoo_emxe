@@ -9,6 +9,7 @@
         'data/hc_transport_vendor.xml',
         'data/mail_template.xml',
         'security/group.xml',
+        'security/rules.xml',
         'security/ir.model.access.csv',
         'views/webclient_templates.xml',
         'views/master_data_view.xml',

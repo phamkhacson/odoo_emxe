@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <menuitem id="hc_data_menu_root" name="Quản lý chuyến" sequence="1"/>
-        <menuitem id="hc_vehicle_management_menu" name="Quản lý xe" sequence="2"/>
-        <menuitem id="hc_configuration_menu" name="Cấu hình" parent="hc_data_menu_root" sequence="50"/>
+        <menuitem id="hc_data_menu_root" name="Quản lý chuyến" sequence="1" groups="advanced_emxe.hc_group_admin,advanced_emxe.hc_group_operator,advanced_emxe.hc_group_vehicle_owner"/>
+        <menuitem id="hc_vehicle_management_menu" name="Quản lý xe" sequence="2" groups="advanced_emxe.hc_group_admin,advanced_emxe.hc_group_operator,advanced_emxe.hc_group_vehicle_owner"/>
+        <menuitem id="hc_configuration_menu" name="Cấu hình" parent="hc_data_menu_root" sequence="50" groups="advanced_emxe.hc_group_admin"/>
         <record id="hc_dealer_view_tree" model="ir.ui.view">
             <field name="name">hc.dealer.view.tree</field>
             <field name="model">hc.dealer</field>
@@ -80,10 +80,10 @@
                         <group>
                             <field name="license_plate"/>
                             <field name="type"/>
-                            <field name="own_vehicle_id"/>
-                            <field name="driver_id"/>
+                            <field name="own_vehicle_id" options="{'no_open': True}"/>
+                            <field name="driver_id" options="{'no_open': True}"/>
                             <field name="fuel_consumption"/>
-                            <field name="process_trip_id"/>
+                            <field name="process_trip_id" options="{'no_open': True}"/>
                         </group>
                     </sheet>
                 </form>
@@ -128,7 +128,7 @@
             <field name="res_model">hc.vehicle.type</field>
             <field name="view_mode">tree,form</field>
         </record>
-        <menuitem id="hc_vehicle_type_view_menu" name="Loại xe" parent="hc_vehicle_management_menu" action="hc_vehicle_type_view_action" sequence="10"/>
+        <menuitem id="hc_vehicle_type_view_menu" name="Loại xe" parent="hc_vehicle_management_menu" action="hc_vehicle_type_view_action" sequence="10" groups="advanced_emxe.hc_group_admin"/>
         <record id="hc_transport_vendor_view_tree" model="ir.ui.view">
             <field name="name">hc.transport.vendor.view.tree</field>
             <field name="model">hc.transport.vendor</field>
@@ -149,7 +149,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
-                            <field name="owner_id"/>
+                            <field name="owner_id" options="{'no_open': True}"/>
                             <field name="owner_identification_number"/>
                             <field name="phone"/>
                             <field name="email"/>
@@ -165,13 +165,13 @@
                                 <tree>
                                     <field name="license_plate"/>
                                     <field name="type"/>
-                                    <field name="driver_id"/>
+                                    <field name="driver_id" options="{'no_open': True}"/>
                                 </tree>
                             </field>
                             <field name="review_ids" readonly="1">
                                 <tree>
-                                    <field name="driver_id"/>
-                                    <field name="trip_id"/>
+                                    <field name="driver_id" options="{'no_open': True}"/>
+                                    <field name="trip_id" options="{'no_open': True}"/>
                                     <field name="trip_rate"/>
                                     <field name="cus_rate"/>
                                     <field name="note"/>
@@ -188,7 +188,7 @@
             <field name="res_model">hc.transport.vendor</field>
             <field name="view_mode">tree,form</field>
         </record>
-        <menuitem id="hc_transport_vendor_view_menu" name="Nhà xe" parent="hc_vehicle_management_menu" action="hc_transport_vendor_view_action" sequence="15"/>
+        <menuitem id="hc_transport_vendor_view_menu" name="Nhà xe" parent="hc_vehicle_management_menu" action="hc_transport_vendor_view_action" sequence="15" groups="advanced_emxe.hc_group_admin"/>
         <record id="hc_trip_cost_type_view_tree" model="ir.ui.view">
             <field name="name">hc.trip.cost.type.view.tree</field>
             <field name="model">hc.trip.cost.type</field>
@@ -398,18 +398,18 @@
                         <group>
                             <group>
                                 <field name="hc_code" attrs="{'readonly':[('state','!=', 'draft')]}"/>
-                                <field name="dealer_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="dealer_id" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="customer_code" readonly="0"/>
                                 <field name="customer_representative" readonly="0"/>
                                 <field name="tour_guide" readonly="0"/>
                                 <field name="tour_guide_phone" readonly="0"/>
-                                <field name="vehicle_type_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
-                                <field name="transport_vendor_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
-                                <field name="vehicle_id" attrs="{'readonly':['|', ('state','!=', 'draft'), ('transport_vendor_id','=', False)]}"/>
-                                <field name="driver_id" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="vehicle_type_id" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="transport_vendor_id" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="vehicle_id" options="{'no_open': True}" attrs="{'readonly':['|', ('state','!=', 'draft'), ('transport_vendor_id','=', False)]}"/>
+                                <field name="driver_id" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="driver_phone" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="driver_accept"/>
-                                <field name="series_id" readonly="0"/>
+                                <field name="series_id" options="{'no_open': True}" readonly="0"/>
                                 <field name="start_time"/>
                                 <field name="end_time"/>
                                 <field name="pick_up_place" readonly="0"/>
@@ -490,8 +490,8 @@
                             </page>
                             <page string="Người phụ trách" name="person_in_charge">
                                 <group>
-                                    <field name="operator_id" string="Điều hành phụ trách"/>
-                                    <field name="accountant_id" string="Kế toán phụ trách"/>
+                                    <field name="operator_id" options="{'no_open': True}" string="Điều hành phụ trách"/>
+                                    <field name="accountant_id" options="{'no_open': True}" string="Kế toán phụ trách"/>
                                 </group>
                             </page>
                         </notebook>
@@ -544,9 +544,9 @@
                         <group>
                             <field name="hc_code" readonly="1"/>
                             <field name="is_common_info" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="transport_vendor_id" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="vehicle_id" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="driver_id" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="transport_vendor_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="vehicle_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="driver_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="driver_phone" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)]}"/>
                         </group>
                         <group>
@@ -554,9 +554,9 @@
                                 <tree create="false" delete="false" editable="bottom">
                                     <field name="hc_code" readonly="1"/>
                                     <field name="state" invisible="1"/>
-                                    <field name="transport_vendor_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
-                                    <field name="vehicle_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
-                                    <field name="driver_id" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="transport_vendor_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="vehicle_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+                                    <field name="driver_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                                     <field name="driver_phone" force_save="True"/>
                                     <button name="action_view_trip" string="Chi tiết" type="object" icon="fa-pencil-square-o"/>
                                 </tree>
@@ -659,7 +659,7 @@
 
                                     gộp
                                 </span>
-                                <field name="hc_trip_batch_id" invisible="1"/>
+                                <field name="hc_trip_batch_id" options="{'no_open': True}" invisible="1"/>
                             </div>
                         </button>
                         <button name="action_view_trip" attrs="{'invisible': [('state', '=', 'draft')]}" type="object" class="oe_stat_button" icon="fa-pencil-square-o">
@@ -677,10 +677,10 @@
                     <group>
                         <group>
                             <field name="hc_code" readonly="0"/>
-                            <field name="dealer_id" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="dealer_id" options="{'no_open': True}" required="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="customer_code" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="vehicle_type_id" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="series_id" readonly="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="vehicle_type_id" options="{'no_open': True}" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
+                            <field name="series_id" options="{'no_open': True}" readonly="1" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
                         </group>
                         <group>
                             <field name="is_common_info" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
@@ -707,7 +707,7 @@
                             <field name="tour_guide" attrs="{'readonly': ['|', ('trip_id', '!=', False), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                             <field name="tour_guide_phone" attrs="{'readonly': ['|', ('trip_id', '!=', False), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                             <field name="note" attrs="{'readonly': ['|', ('trip_id', '!=', False), ('parent.is_common_info', '=', False)]}" force_save="True"/>
-                            <field name="trip_id" readonly="1"/>
+                            <field name="trip_id" options="{'no_open': True}" readonly="1"/>
                             <field name="id" invisible="1"/>
                             <button name="action_create_trip" string="Bổ sung lịch trình" type="object" class="oe_highlight" attrs="{'invisible': ['|',('parent.state', '=', 'draft'),('trip_id', '!=', False)]}"/>
                             <button name="unlink_schedule" confirm="Bạn có chắc chắn muốn xóa bản ghi?" type="object" icon="fa-trash-o" attrs="{'invisible': [('id', '=', False)]}"/>
@@ -760,7 +760,7 @@
                 <form>
                     <sheet>
                         <group>
-                            <field name="transport_vendor_id"/>
+                            <field name="transport_vendor_id" options="{'no_open': True}"/>
                             <field name="est_cost"/>
                         </group>
                     </sheet>
@@ -788,8 +788,8 @@
                 <form>
                     <sheet>
                         <group>
-                            <field name="vehicle_id"/>
-                            <field name="user_id"/>
+                            <field name="vehicle_id" options="{'no_open': True}"/>
+                            <field name="user_id" options="{'no_open': True}"/>
                             <field name="date"/>
                             <field name="liter"/>
                             <field name="price"/>
@@ -844,8 +844,8 @@
                 <form>
                     <sheet>
                         <group>
-                            <field name="vehicle_id"/>
-                            <field name="user_id"/>
+                            <field name="vehicle_id" options="{'no_open': True}"/>
+                            <field name="user_id" options="{'no_open': True}"/>
                             <field name="date"/>
                             <field name="amount"/>
                             <field name="note"/>
@@ -895,9 +895,9 @@
                     <sheet>
                         <group>
                             <field name="name"/>
-                            <field name="dealer_id"/>
-                            <field name="operator_id"/>
-                            <field name="accountant_id"/>
+                            <field name="dealer_id" options="{'no_open': True}"/>
+                            <field name="operator_id" options="{'no_open': True}"/>
+                            <field name="accountant_id" options="{'no_open': True}"/>
                         </group>
                     </sheet>
                 </form>
