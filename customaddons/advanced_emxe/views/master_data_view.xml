@@ -154,6 +154,13 @@
                             <field name="phone"/>
                             <field name="email"/>
                             <field name="review_point"/>
+                            <field name="is_main_vendor"/>
+                            <field name="bank_account_ids">
+                                <tree editable="bottom">
+                                    <field name="name"/>
+                                    <field name="bank_name"/>
+                                </tree>
+                            </field>
                             <field name="vehicle_ids" readonly="1">
                                 <tree>
                                     <field name="license_plate"/>

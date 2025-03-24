@@ -17,6 +17,8 @@ class HcTransportVendor(models.Model):
     vehicle_ids = fields.One2many('hc.vehicle', 'own_vehicle_id', string="Danh sách xe")
     review_point = fields.Float(string="Điểm đánh giá", compute='_compute_review_point', store=True)
     review_ids = fields.One2many('hc.vendor.review', 'vendor_id', string="Đánh giá")
+    bank_account_ids = fields.One2many('hc.bank.account', 'vendor_id', string="Tài khoản ngân hàng")
+    is_main_vendor = fields.Boolean(string="Nhà xe chính")
 
     @api.depends('review_ids', 'review_ids.trip_rate')
     def _compute_review_point(self):

@@ -453,9 +453,9 @@ class EMXEFlutterApi(http.Controller):
                     "id": trip.id,
                     "name": f"{trip.pick_up_place} - {trip.destination}",
                     "driver_accept": trip.driver_accept,
-                    "start_time": trip.start_time,
-                    "start_in": trip.pick_up_place,
-                    "finish_in": trip.destination,
+                    "start_time": trip.start_time if trip.start_time else '',
+                    "start_in": trip.pick_up_place if trip.pick_up_place else '',
+                    "finish_in": trip.destination if trip.destination else '',
                     "state": self.state_convert(trip.state, trip),
                 }
                 result.append(trip_data)
@@ -495,18 +495,18 @@ class EMXEFlutterApi(http.Controller):
                         "id": trip.id,
                         "name": f"{trip.pick_up_place} - {trip.destination}",
                         "driver_accept": trip.driver_accept,
-                        "start_time": trip.start_time,
-                        "start_in": trip.pick_up_place,
-                        "finish_in": trip.destination,
+                        "start_time": trip.start_time if trip.start_time else '',
+                        "start_in": trip.pick_up_place if trip.pick_up_place else '',
+                        "finish_in": trip.destination if trip.destination else '',
                         "state": self.state_convert(trip.state, trip),
                         "payment_status": payment_status,
-                        "tour_guide": trip.tour_guide,
-                        "phone": trip.driver_phone,
-                        "transport_vendor": trip.transport_vendor_id.name if trip.transport_vendor_id else False,
-                        "vehicle_number": trip.vehicle_id.license_plate if trip.vehicle_id else False,
-                        "vehicle_type": trip.vehicle_id.type.name if trip.vehicle_id else False,
-                        "note": trip.note,
-                        "amount": trip.customer_amount,
+                        "tour_guide": trip.tour_guide if trip.tour_guide else '',
+                        "phone": trip.tour_guide_phone if trip.tour_guide_phone else '',
+                        "transport_vendor": trip.transport_vendor_id.name if trip.transport_vendor_id else '',
+                        "vehicle_number": trip.vehicle_id.license_plate if trip.vehicle_id else '',
+                        "vehicle_type": trip.vehicle_id.type.name if trip.vehicle_id else '',
+                        "note": trip.note if trip.note else '',
+                        "amount": trip.customer_amount if trip.customer_amount else 0,
                     }
                     return {
                         'status': 'success',
@@ -913,17 +913,18 @@ class EMXEFlutterApi(http.Controller):
                     }
                 }
 
-            if not trip_id.dealer_id.bank_account_ids:
+            hc_vendor_id = request.env['hc.transport.vendor'].search([('is_main_vendor', '=', True)], limit=1)
+            if not hc_vendor_id or not hc_vendor_id.bank_account_ids:
                 return {
                     "status": "fail",
                     "code": 400,
-                    "message": "Chưa config tk ngân hàng cho đại lý Hoàng Châu",
+                    "message": "Chưa cấu hình tài khoản ngân hàng cho nhà xe",
                     "data": {
                         "success": False
                     }
                 }
-            bank_acc_id = trip_id.dealer_id.bank_account_ids[0]
-            qr_code = f'https://img.vietqr.io/image/{bank_acc_id.bank_name}-{bank_acc_id.name}-compact2.png?amount={amount}&addInfo={trip_id.hc_code}'
+            bank_acc_id = hc_vendor_id.bank_account_ids[0]
+            qr_code = f'https://img.vietqr.io/image/{bank_acc_id.bank_name}-{bank_acc_id.name}-compact2.png?amount={amount}&addInfo=thanh+toan+chuyen+xe+{trip_id.hc_code}'
 
             return {
                 'status': 'success',
@@ -1119,18 +1120,18 @@ class EMXEFlutterApi(http.Controller):
                     result = {
                         "id": trip.id,
                         "name": f"{trip.pick_up_place} - {trip.destination}",
-                        "date": trip.start_time,
-                        "start_in": trip.pick_up_place,
-                        "finish_in": trip.destination,
-                        "start_time": trip.start_time_actual,
-                        "end_time": trip.end_time_actual,
-                        "trip_distance": trip.distance_actual,
-                        "time_total": trip.total_time_actual,
+                        "date": trip.start_time if trip.start_time else '',
+                        "start_in": trip.pick_up_place if trip.pick_up_place else '',
+                        "finish_in": trip.destination if trip.destination else '',
+                        "start_time": trip.start_time_actual if trip.start_time_actual else '',
+                        "end_time": trip.end_time_actual if trip.end_time_actual else '',
+                        "trip_distance": trip.distance_actual if trip.distance_actual else 0,
+                        "time_total": trip.total_time_actual if trip.total_time_actual else 0,
                         "costs": costs,
                         "driver_pay": driver_pay,
                         "driver_advance": driver_advance,
                         "driver_cash_recieved": driver_cash_recieved,
-                        "note": trip.cost_note,
+                        "note": trip.cost_note if trip.cost_note else '',
                     }
                     return {
                         'status': 'success',
@@ -1317,7 +1318,7 @@ class EMXEFlutterApi(http.Controller):
                 transactions.append({
                     'type': 'debit',
                     'amount': trip.driver_salary,
-                    'datetime': trip.end_time,
+                    'datetime': trip.end_time if trip.end_time else '',
                     'description': f'Lái xe nhận tiền từ chuyến {trip.hc_code}',
                 })
             return {
@@ -1431,11 +1432,11 @@ class EMXEFlutterApi(http.Controller):
             result = []
             for oil_refill in oil_refill_list:
                 result.append({
-                    'date': oil_refill.date,
-                    'vehicle_no': oil_refill.vehicle_id.license_plate,
-                    'amount': oil_refill.amount,
-                    'unit_cost': oil_refill.price,
-                    'oil_size': oil_refill.liter,
+                    'date': oil_refill.date if oil_refill.date else '',
+                    'vehicle_no': oil_refill.vehicle_id.license_plate if oil_refill.vehicle_id.license_plate else '',
+                    'amount': oil_refill.amount if oil_refill.amount else 0,
+                    'unit_cost': oil_refill.price if oil_refill.price else 0,
+                    'oil_size': oil_refill.liter if oil_refill.liter else 0,
                 })
             return {
                 "status": "success",
@@ -1530,10 +1531,10 @@ class EMXEFlutterApi(http.Controller):
             result = []
             for repair_vehicle in repair_vehicle_list:
                 result.append({
-                    'date': repair_vehicle.date,
-                    'vehicle_no': repair_vehicle.vehicle_id.license_plate,
-                    'repair_cost': repair_vehicle.amount,
-                    'note': repair_vehicle.note,
+                    'date': repair_vehicle.date if repair_vehicle.date else '',
+                    'vehicle_no': repair_vehicle.vehicle_id.license_plate if repair_vehicle.vehicle_id.license_plate else '',
+                    'repair_cost': repair_vehicle.amount if repair_vehicle.amount else 0,
+                    'note': repair_vehicle.note if repair_vehicle.note else '',
                 })
             return {
                 "status": "success",
@@ -1711,10 +1712,10 @@ class EMXEFlutterApi(http.Controller):
             result = []
             for vehicle in vehicle_list:
                 result.append({
-                    'number': vehicle.license_plate,
+                    'number': vehicle.license_plate if vehicle.license_plate else '',
                     'type': vehicle.type.name if vehicle.type else '',
                     'vendor': vehicle.own_vehicle_id.name if vehicle.own_vehicle_id else '',
-                    'fuel_consumption': vehicle.fuel_consumption,
+                    'fuel_consumption': vehicle.fuel_consumption if vehicle.fuel_consumption else 0,
                 })
             return {
                 "status": "success",
@@ -1785,7 +1786,7 @@ class EMXEFlutterApi(http.Controller):
                             'message_id': mess.id,
                             'type': 'payment' if 'của bạn đã được hoàn thành' in mess.body else 'trip',
                             'message_name': 'Thông báo',
-                            'message_body': strip_html_tags(mess.body) if mess.body else None,
+                            'message_body': strip_html_tags(mess.body) if mess.body else '',
                             'res_id': mess.res_id,
                         }
                         message_list.append(val)

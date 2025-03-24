@@ -11,3 +11,4 @@ class HcBankAccount(models.Model):
     name = fields.Char(string="Số tài khoản")
     bank_name = fields.Char(string="Ngân hàng")
     dealer_id = fields.Many2one('hc.dealer', string='Đại lý')
+    vendor_id = fields.Many2one('hc.transport.vendor', string='Nhà xe')
