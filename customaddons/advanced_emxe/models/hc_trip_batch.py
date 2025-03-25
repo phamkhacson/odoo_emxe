@@ -18,6 +18,7 @@ class HcTripBatch(models.Model):
     state = fields.Selection([('draft', 'Khai báo chuyến'), ('confirm', 'Đã điều chuyến')], string="Trạng thái", default='draft')
     is_common_info = fields.Boolean(string="Chỉnh sửa chi tiết", default=True)
     transport_vendor_id = fields.Many2one('hc.transport.vendor', string="Nhà xe")
+    dealer_id = fields.Many2one('hc.dealer', string="Đại lý")
     vehicle_id = fields.Many2one('hc.vehicle', string="Xe")
     driver_id = fields.Many2one('res.users', string="Tài xế", related="vehicle_id.driver_id", store=True)
     driver_phone = fields.Char(string="SĐT tài xế", related="driver_id.phone")
@@ -49,6 +50,7 @@ class HcTripBatch(models.Model):
             draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
             for trip in draft_trip_ids:
                 trip.sudo().update({
+                    'dealer_id': self.dealer_id,
                     'transport_vendor_id': self.transport_vendor_id,
                     'vehicle_id': self.vehicle_id,
                     'driver_id': self.driver_id
@@ -74,4 +76,11 @@ class HcTripBatch(models.Model):
             draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
             for trip in draft_trip_ids:
                 trip.driver_id = self.driver_id
+
+    @api.onchange('dealer_id')
+    def onchange_dealer_id(self):
+        if not self.is_common_info:
+            draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
+            for trip in draft_trip_ids:
+                trip.dealer_id = self.dealer_id
 

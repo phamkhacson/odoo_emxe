@@ -422,7 +422,7 @@ class EMXEFlutterApi(http.Controller):
                     }
                 }
             domain = [
-                ('driver_id', 'in', [user.id, False])
+                ('driver_id', '=', user.id)
             ]
             if date_from:
                 domain.append(('start_time', '>=', date_from))
@@ -485,11 +485,12 @@ class EMXEFlutterApi(http.Controller):
                     payment_status = ''
                     if trip.remain_customer_amount > 0:
                         if trip.remain_customer_amount != trip.customer_amount:
-                            payment_status = 'Thanh toán 1 phần'
+                            payment_status = 2
+
                         else:
-                            payment_status = 'Chưa thanh toán'
+                            payment_status = 1
                     else:
-                        payment_status = 'Đã thanh toán'
+                        payment_status = 3
 
                     result = {
                         "id": trip.id,
@@ -1708,9 +1709,9 @@ class EMXEFlutterApi(http.Controller):
     def get_vehicle_list(self, **kw):
         try:
             user = request.env.user
-            vehicle_list = request.env['hc.vehicle'].search([('driver_id', '=', user.id)])
+            # vehicle_list = request.env['hc.vehicle'].search([('driver_id', '=', user.id)])
             result = []
-            for vehicle in vehicle_list:
+            for vehicle in user.vehicle_ids:
                 result.append({
                     'number': vehicle.license_plate if vehicle.license_plate else '',
                     'type': vehicle.type.name if vehicle.type else '',

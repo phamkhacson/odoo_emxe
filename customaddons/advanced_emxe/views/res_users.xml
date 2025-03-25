@@ -23,7 +23,7 @@
                             <field name="position"/>
                             <field name="emxe_gender" required="1"/>
                             <field name="dealer_id"/>
-                            <field name="vehicle_id"/>
+                            <field name="vehicle_ids" widget="many2many_tags"/>
                             <field name="transport_vendor_id"/>
                         </group>
                     </page>
