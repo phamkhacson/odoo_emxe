@@ -518,6 +518,19 @@
             </field>
         </record>
 
+        <record id="hc_trip_batch_view_tree" model="ir.ui.view">
+            <field name="name">hc.trip.view.batch.tree</field>
+            <field name="model">hc.trip.batch</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="hc_code"/>
+                    <field name="display_dealer_id"/>
+                    <field name="date_start"/>
+                    <field name="pick_up_place"/>
+                </tree>
+            </field>
+        </record>
+
         <record id="hc_trip_batch_view_form" model="ir.ui.view">
             <field name="name">hc.trip.batch.view.form</field>
             <field name="model">hc.trip.batch</field>
@@ -618,14 +631,14 @@
             </field>
         </record>
         <record id="hc_trip_view_action" model="ir.actions.act_window">
-            <field name="name">Thay đổi thông tin chuyến</field>
+            <field name="name">Điều chuyến lẻ</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">hc.trip</field>
             <field name="view_mode">tree,form</field>
             <field name="context">{"search_default_unassigned_vehicle": 1,"search_default_group_by_hc_code": 1}</field>
         </record>
         <record id="hc_trip_batch_view_action" model="ir.actions.act_window">
-            <field name="name">Điều chuyến</field>
+            <field name="name">Điều chuyến gộp</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">hc.trip.batch</field>
             <field name="view_mode">tree,form</field>

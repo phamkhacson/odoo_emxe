@@ -7,5 +7,16 @@
             <field name="domain_force">[('transport_vendor_id.owner_id','=', user.id)]</field>
             <field name="groups" eval="[(4, ref('advanced_emxe.hc_group_vehicle_owner'))]"/>
         </record>
+
+        <record model="ir.rule" id="hc_group_rule">
+            <field name="name">hc_group_rule</field>
+            <field name="model_id" ref="model_hc_trip"/>
+            <field name="domain_force">[(1,'=', 1)]</field>
+            <field name="groups" eval="[(6, 0, [ref('advanced_emxe.hc_group_dealer'),
+                                                ref('advanced_emxe.hc_group_accountant'),
+                                                ref('advanced_emxe.hc_group_admin'),
+                                                ref('advanced_emxe.hc_group_operator')
+                                                ])]"/>
+        </record>
     </data>
 </odoo>

@@ -210,7 +210,8 @@ class EMXEFlutterApi(http.Controller):
                         "avatar_url": img_url,
                         "gender": dict(user._fields['emxe_gender'].selection).get(user.emxe_gender),
                         "address": work_location,
-                        "language": user.lang
+                        "language": user.lang,
+                        "is_hc_driver": user.transport_vendor_id.is_main_vendor if user.transport_vendor_id else False,
                     }
                 }
             else:
@@ -369,7 +370,7 @@ class EMXEFlutterApi(http.Controller):
             user = request.env.user
             date_from = kw.get('date_from')
             if date_from:
-                date_from = datetime.strptime(f'{date_from} 00:00:00', '%d/%m/%Y %H:%M:%S')
+                date_from = datetime.strptime(f'{date_from} 00:00:00', '%d/%m/%Y %H:%M:%S') - timedelta(hours=7)
             # else:
             #     return {
             #         "status": "fail",
@@ -381,7 +382,7 @@ class EMXEFlutterApi(http.Controller):
             #     }
             date_to = kw.get('date_to')
             if date_to:
-                date_to = datetime.strptime(f'{date_to} 23:59:59', '%d/%m/%Y %H:%M:%S')
+                date_to = datetime.strptime(f'{date_to} 23:59:59', '%d/%m/%Y %H:%M:%S') - timedelta(hours=7)
             # else:
             #     return {
             #         "status": "fail",
@@ -453,7 +454,7 @@ class EMXEFlutterApi(http.Controller):
                     "id": trip.id,
                     "name": f"{trip.pick_up_place} - {trip.destination}",
                     "driver_accept": trip.driver_accept,
-                    "start_time": trip.start_time if trip.start_time else '',
+                    "start_time": trip.start_time + timedelta(hours=7) if trip.start_time else '',
                     "start_in": trip.pick_up_place if trip.pick_up_place else '',
                     "finish_in": trip.destination if trip.destination else '',
                     "state": self.state_convert(trip.state, trip),
@@ -496,7 +497,7 @@ class EMXEFlutterApi(http.Controller):
                         "id": trip.id,
                         "name": f"{trip.pick_up_place} - {trip.destination}",
                         "driver_accept": trip.driver_accept,
-                        "start_time": trip.start_time if trip.start_time else '',
+                        "start_time": trip.start_time + timedelta(hours=7) if trip.start_time else '',
                         "start_in": trip.pick_up_place if trip.pick_up_place else '',
                         "finish_in": trip.destination if trip.destination else '',
                         "state": self.state_convert(trip.state, trip),
@@ -1121,11 +1122,11 @@ class EMXEFlutterApi(http.Controller):
                     result = {
                         "id": trip.id,
                         "name": f"{trip.pick_up_place} - {trip.destination}",
-                        "date": trip.start_time if trip.start_time else '',
+                        "date": trip.start_time + timedelta(hours=7) if trip.start_time else '',
                         "start_in": trip.pick_up_place if trip.pick_up_place else '',
                         "finish_in": trip.destination if trip.destination else '',
-                        "start_time": trip.start_time_actual if trip.start_time_actual else '',
-                        "end_time": trip.end_time_actual if trip.end_time_actual else '',
+                        "start_time": trip.start_time_actual + timedelta(hours=7) if trip.start_time_actual else '',
+                        "end_time": trip.end_time_actual + timedelta(hours=7) if trip.end_time_actual else '',
                         "trip_distance": trip.distance_actual if trip.distance_actual else 0,
                         "time_total": trip.total_time_actual if trip.total_time_actual else 0,
                         "costs": costs,
@@ -1277,15 +1278,24 @@ class EMXEFlutterApi(http.Controller):
                             "success": False
                         }
                     }
-                existed_cost = trip_id.driver_cost_ids.filtered(lambda x: x.driver_cost_id == cost_payment_record_id)
-                if existed_cost:
-                    existed_cost.unlink()
-                payment_id = request.env['hc.trip.amount.detail'].create({
-                    'driver_cost_record_id': trip_id.id,
-                    'driver_cost_id': cost_payment_record_id.id,
-                    'payment_amount': float(amount),
-                    'payer': cost['payer']
-                })
+                if cost['payer'] == 'driver':
+                    existed_cost = trip_id.driver_cost_ids.filtered(lambda x: x.driver_cost_id == cost_payment_record_id)
+                    if existed_cost:
+                        existed_cost.unlink()
+                    payment_id = request.env['hc.trip.amount.detail'].create({
+                        'driver_cost_record_id': trip_id.id,
+                        'driver_cost_id': cost_payment_record_id.id,
+                        'payment_amount': float(amount),
+                    })
+                else:
+                    existed_cost = trip_id.cost_payment_detail_ids.filtered(lambda x: x.paid_cost_id == cost_payment_record_id)
+                    if existed_cost:
+                        existed_cost.unlink()
+                    payment_id = request.env['hc.trip.amount.detail'].create({
+                        'cost_payment_record_id': trip_id.id,
+                        'paid_cost_id': cost_payment_record_id.id,
+                        'payment_amount': float(amount),
+                    })
             trip_id.sudo().cost_submited = True
 
             return {
@@ -1309,19 +1319,22 @@ class EMXEFlutterApi(http.Controller):
     def get_balance(self, **kw):
         try:
             user = request.env.user
+            offset = kw.get('index') if kw.get('index') else 0
+            limit = kw.get('offset') if kw.get('offset') else 80
             trip_ids = request.env['hc.trip'].search(
-                [('driver_id', '=', user.id), ('state', 'in', ['payment', 'done'])])
+                [('driver_id', '=', user.id), ('state', 'in', ['payment', 'done'])], offset=offset, limit=limit, order='id desc')
             driver_salary = sum(trip_ids.mapped('driver_salary'))
             transactions = []
             for trip in trip_ids:
                 # driver_advance = sum(trip.cost_payment_detail_ids.filtered(lambda x: x.paid_cost_id.name == 'Tạm ứng cho lái xe').mapped('payment_amount'))
                 # driver_cash_recieved = sum(trip.income_payment_detail_ids.filtered(lambda x: x.payment_income_id.name == 'Lái xe thu tiền').mapped('payment_amount'))
-                transactions.append({
-                    'type': 'debit',
-                    'amount': trip.driver_salary,
-                    'datetime': trip.end_time if trip.end_time else '',
-                    'description': f'Lái xe nhận tiền từ chuyến {trip.hc_code}',
-                })
+                if trip.driver_salary > 0:
+                    transactions.append({
+                        'type': 'debit',
+                        'amount': trip.driver_salary,
+                        'datetime': trip.end_time + timedelta(hours=7) if trip.end_time else '',
+                        'description': f'Lái xe nhận tiền từ chuyến {trip.hc_code}',
+                    })
             return {
                 "status": "success",
                 "code": 200,
@@ -1677,8 +1690,8 @@ class EMXEFlutterApi(http.Controller):
             locate_list = eval(trip.locate_list) if trip.locate_list else []
             last_distance = 0
             for i in range(len(locate_list)):
-                if not locate_list[len(locate_list) - i]['is_pause']:
-                    last_locate = locate_list[len(locate_list) - i]
+                if not locate_list[len(locate_list) - i - 1]['is_pause']:
+                    last_locate = locate_list[len(locate_list) - i - 1]
                     last_distance = haversine(last_locate['latitude'], last_locate['longitude'], latitude, longitude)
                     break
             locate_list.append({

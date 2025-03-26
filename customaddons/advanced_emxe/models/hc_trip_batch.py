@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 
 from odoo.exceptions import UserError
 from odoo.fields import One2many
+from odoo.tools.populate import compute
 
 
 class HcTripBatch(models.Model):
@@ -15,7 +16,8 @@ class HcTripBatch(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     hc_code = fields.Char(string="Code HC", copy=False)
-    state = fields.Selection([('draft', 'Khai báo chuyến'), ('confirm', 'Đã điều chuyến')], string="Trạng thái", default='draft')
+    state = fields.Selection([('draft', 'Khai báo chuyến'), ('confirm', 'Đã điều chuyến')], string="Trạng thái",
+                             default='draft')
     is_common_info = fields.Boolean(string="Chỉnh sửa chi tiết", default=True)
     transport_vendor_id = fields.Many2one('hc.transport.vendor', string="Nhà xe")
     dealer_id = fields.Many2one('hc.dealer', string="Đại lý")
@@ -23,6 +25,29 @@ class HcTripBatch(models.Model):
     driver_id = fields.Many2one('res.users', string="Tài xế", related="vehicle_id.driver_id", store=True)
     driver_phone = fields.Char(string="SĐT tài xế", related="driver_id.phone")
     hc_trip_ids = One2many('hc.trip', 'batch_id', string="Lịch trình")
+    date_start = fields.Datetime(string="Ngày bắt đầu", compute='_compute_start', store=True)
+    pick_up_place = fields.Char(string="Điểm khởi hành", compute='_compute_start', store=True)
+    display_dealer_id = fields.Char(string="Đại lý", compute="_compute_start_dealer", store=True)
+
+    @api.depends('dealer_id', 'hc_trip_ids')
+    def _compute_start_dealer(self):
+        for rec in self:
+            if rec.dealer_id:
+                rec.display_dealer_id = rec.dealer_id
+            elif rec.hc_trip_ids.mapped('dealer_id'):
+                rec.display_dealer_id = rec.hc_trip_ids.mapped('dealer_id')[0]
+            else:
+                rec.display_dealer_id = False
+
+    @api.depends('hc_trip_ids')
+    def _compute_start(self):
+        for rec in self:
+            if rec.hc_trip_ids:
+                rec.date_start = rec.hc_trip_ids[0].start_time
+                rec.pick_up_place = rec.hc_trip_ids[0].pick_up_place
+            else:
+                rec.date_start = False
+                rec.pick_up_place = False
 
     def button_confirm(self):
         self.state = 'confirm'
