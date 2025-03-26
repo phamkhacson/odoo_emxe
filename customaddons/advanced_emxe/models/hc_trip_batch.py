@@ -27,7 +27,7 @@ class HcTripBatch(models.Model):
     hc_trip_ids = One2many('hc.trip', 'batch_id', string="Lịch trình")
     date_start = fields.Datetime(string="Ngày bắt đầu", compute='_compute_start', store=True)
     pick_up_place = fields.Char(string="Điểm khởi hành", compute='_compute_start', store=True)
-    display_dealer_id = fields.Char(string="Đại lý", compute="_compute_start_dealer", store=True)
+    display_dealer_id = fields.Many2one('hc.dealer', string="Đại lý", compute="_compute_start_dealer", store=True)
 
     @api.depends('dealer_id', 'hc_trip_ids')
     def _compute_start_dealer(self):
