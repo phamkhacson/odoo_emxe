@@ -27,15 +27,14 @@ class HcTripBatch(models.Model):
     hc_trip_ids = One2many('hc.trip', 'batch_id', string="Lịch trình")
     date_start = fields.Datetime(string="Ngày bắt đầu", compute='_compute_start', store=True)
     pick_up_place = fields.Char(string="Điểm khởi hành", compute='_compute_start', store=True)
-    display_dealer_id = fields.Many2one('hc.dealer', string="Đại lý", compute="_compute_start_dealer", store=True)
+    display_dealer_id = fields.Char(string="Đại lý", compute="_compute_start_dealer")
 
-    @api.depends('dealer_id', 'hc_trip_ids')
     def _compute_start_dealer(self):
         for rec in self:
             if rec.dealer_id:
-                rec.display_dealer_id = rec.dealer_id
+                rec.display_dealer_id = rec.dealer_id.name
             elif rec.hc_trip_ids.mapped('dealer_id'):
-                rec.display_dealer_id = rec.hc_trip_ids.mapped('dealer_id')[0]
+                rec.display_dealer_id = rec.hc_trip_ids.mapped('dealer_id')[0].name
             else:
                 rec.display_dealer_id = False
 
