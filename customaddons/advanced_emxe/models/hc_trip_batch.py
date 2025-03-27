@@ -16,8 +16,7 @@ class HcTripBatch(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
     hc_code = fields.Char(string="Code HC", copy=False)
-    state = fields.Selection([('draft', 'Khai báo chuyến'), ('confirm', 'Đã điều chuyến')], string="Trạng thái",
-                             default='draft')
+    state = fields.Selection([('draft', 'Khai báo chuyến'), ('confirm', 'Đã điều chuyến')], string="Trạng thái", default='draft')
     is_common_info = fields.Boolean(string="Chỉnh sửa chi tiết", default=True)
     transport_vendor_id = fields.Many2one('hc.transport.vendor', string="Nhà xe")
     dealer_id = fields.Many2one('hc.dealer', string="Đại lý")
@@ -37,7 +36,7 @@ class HcTripBatch(models.Model):
                 rec.display_dealer_id = rec.hc_trip_ids.mapped('dealer_id')[0].name
             else:
                 rec.display_dealer_id = False
-
+    
     @api.depends('hc_trip_ids')
     def _compute_start(self):
         for rec in self:

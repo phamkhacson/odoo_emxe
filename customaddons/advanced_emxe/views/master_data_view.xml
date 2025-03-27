@@ -438,7 +438,8 @@
                             <page string="Thu" name="income" groups="advanced_emxe.hc_group_accountant,base.group_system">
                                 <h3>Tiền thu</h3>
                                 <field name="income_detail_ids" nolabel="1">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" default_order="sequence">
+                                        <field name="sequence" attrs="{'column_invisible': True}"/>
                                         <field name="income_id" domain="[('entry_type', 'in', ['income', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
                                         <field name="qty"/>
                                         <field name="price"/>
@@ -447,7 +448,8 @@
                                 </field>
                                 <h3>Tiền đã thu</h3>
                                 <field name="income_payment_detail_ids" nolabel="1">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" default_order="sequence">
+                                        <field name="sequence" attrs="{'column_invisible': True}"/>
                                         <field name="payment_income_id" domain="[('entry_type', 'in', ['payment_income', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
                                         <field name="payment_amount" sum="Tổng"/>
                                         <field name="note"/>
@@ -457,7 +459,8 @@
                             <page string="Chi" name="cost" groups="advanced_emxe.hc_group_accountant,base.group_system">
                                 <h3>Chi phí đã chi cho nhà xe</h3>
                                 <field name="cost_detail_ids" nolabel="1">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" default_order="sequence">
+                                        <field name="sequence" attrs="{'column_invisible': True}"/>
                                         <field name="cost_id" domain="[('entry_type', 'in', ['cost', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
                                         <field name="qty"/>
                                         <field name="price"/>
@@ -466,7 +469,8 @@
                                 </field>
                                 <h3>Tiền đã chi</h3>
                                 <field name="cost_payment_detail_ids" nolabel="1">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" default_order="sequence">
+                                        <field name="sequence" attrs="{'column_invisible': True}"/>
                                         <field name="paid_cost_id" domain="[('entry_type', 'in', ['paid_cost', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
                                         <field name="payment_amount" sum="Tổng"/>
                                         <field name="note"/>
@@ -474,7 +478,8 @@
                                 </field>
                                 <h3>Các khoản lái xe đã chi</h3>
                                 <field name="driver_cost_ids" nolabel="1">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" default_order="sequence">
+                                        <field name="sequence" attrs="{'column_invisible': True}"/>
                                         <field name="driver_cost_id" domain="[('entry_type', 'in', ['driver_cost', 'operation_cost'])]" options="{'no_open': True, 'no_create': True}"/>
                                         <field name="payment_amount" sum="Tổng"/>
                                         <field name="note"/>
@@ -483,7 +488,8 @@
                             </page>
                             <page string="Chi phí nội bộ" name="operation_cost" groups="advanced_emxe.hc_group_accountant,base.group_system">
                                 <field name="operation_cost_ids" nolabel="1">
-                                    <tree editable="bottom">
+                                    <tree editable="bottom" default_order="sequence">
+                                        <field name="sequence" attrs="{'column_invisible': True}"/>
                                         <field name="operation_cost_id" domain="[('entry_type', '=', 'operation_cost')]" options="{'no_open': True, 'no_create': True}"/>
                                         <field name="operation_cost_price" sum="Tổng"/>
                                     </tree>
@@ -818,6 +824,7 @@
                             <field name="end_km"/>
                             <field name="run_km"/>
                             <field name="mtt"/>
+                            <field name="image"/>
                         </group>
                     </sheet>
                 </form>

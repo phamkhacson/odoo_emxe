@@ -999,7 +999,19 @@ class EMXEFlutterApi(http.Controller):
                         "success": False
                     }
                 }
-            payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', 'Lái xe thu tiền')], limit=1)
+            # create attachment form payment_img
+            attachment = request.env['ir.attachment'].create({
+                'name': 'Payment Image',
+                'datas': payment_img,
+                'res_model': 'hc.trip',
+                'res_id': trip_id.id,
+            })
+            if method == 'cash':
+                cost_name = 'Lái xe thu tiền'
+                payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)], limit=1)
+            else:
+                cost_name = 'Khách hàng thanh toán'
+                payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)], limit=1)
             if not payment_income_id:
                 activity_id = request.env.ref('mail.mail_activity_data_todo').id
                 now = (datetime.now() + timedelta(hours=7)).strftime("%d/%m/%Y %H:%M:%S")
@@ -1008,12 +1020,12 @@ class EMXEFlutterApi(http.Controller):
                     'user_id': 2,
                     'res_id': trip_id.id,
                     'res_model_id': request.env['ir.model'].sudo().search([('model', '=', 'hc.trip')], limit=1).id,
-                    'summary': f'{now} Ghi nhận Tài xế thu hộ {amount}vnđ KHÔNG thành công do thiếu cấu hình loại chi phí Tài xế thu hộ. Admin vui lòng kiểm tra lại.',
+                    'summary': f'{now} Ghi nhận Tài xế thu hộ {amount}vnđ KHÔNG thành công do thiếu cấu hình loại chi phí {cost_name}. Admin vui lòng kiểm tra lại.',
                 })
                 return {
                     "status": "fail",
                     "code": 400,
-                    "message": "Chưa cấu hình loại doanh thu 'Lái xe thu tiền'",
+                    "message": f"Chưa cấu hình loại doanh thu {cost_name}",
                     "data": {
                         "success": False
                     }
@@ -1049,45 +1061,8 @@ class EMXEFlutterApi(http.Controller):
             if id:
                 trip = request.env['hc.trip'].search([('id', '=', int(id))])
                 if trip:
-                    res_model_id = request.env['ir.model'].sudo().search([('model', '=', 'hc.trip')],
-                                                                         limit=1).id
-                    activity_id = request.env.ref('mail.mail_activity_data_todo').id
-                    # driver_advance = 0
-                    # payment_driver_advance_id = request.env['hc.trip.entry.config'].search(
-                    #     [('name', '=', 'Tạm ứng cho lái xe')], limit=1)
-                    # if payment_driver_advance_id:
-                    #     driver_advance = sum(trip.cost_payment_detail_ids.filtered(
-                    #         lambda x: x.paid_cost_id == payment_driver_advance_id).mapped('payment_amount'))
-                    # else:
-                    #     da_existed_activity = request.env['mail.activity'].search(
-                    #         [('res_model_id', '=', res_model_id), ('res_id', '=', trip.id), ('summary', '=',
-                    #                                                                          'Thiếu cấu hình loại chi phí Tạm ứng cho lái xe. Admin vui lòng kiểm tra lại.')])
-                    #     if not da_existed_activity:
-                    #         request.env['mail.activity'].sudo().create({
-                    #             'activity_type_id': activity_id,
-                    #             'user_id': 2,
-                    #             'res_id': trip.id,
-                    #             'res_model_id': res_model_id,
-                    #             'summary': 'Thiếu cấu hình loại chi phí Tạm ứng cho lái xe. Admin vui lòng kiểm tra lại.',
-                    #         })
-                    payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', 'Lái xe thu tiền')],
-                                                                                   limit=1)
-                    driver_cash_recieved = 0
-                    if payment_income_id:
-                        driver_cash_recieved = sum(trip.income_payment_detail_ids.filtered(
-                            lambda x: x.payment_income_id == payment_income_id).mapped('payment_amount'))
-                    else:
-                        dcr_existed_activity = request.env['mail.activity'].search(
-                            [('res_model_id', '=', res_model_id), ('res_id', '=', trip.id), ('summary', '=',
-                                                                                             'Thiếu cấu hình loại chi phí Lái xe thu tiền. Admin vui lòng kiểm tra lại.')])
-                        if not dcr_existed_activity:
-                            request.env['mail.activity'].sudo().create({
-                                'activity_type_id': activity_id,
-                                'user_id': 2,
-                                'res_id': trip.id,
-                                'res_model_id': res_model_id,
-                                'summary': 'Thiếu cấu hình loại chi phí Lái xe thu tiền. Admin vui lòng kiểm tra lại.',
-                            })
+                    driver_cash_recieved = sum(trip.income_payment_detail_ids.filtered(
+                        lambda x: x.payment_income_id.name in ['Lái xe thu tiền', 'Khách hàng thanh toán']).mapped('payment_amount'))
 
                     costs = []
                     cost_codes = {
@@ -1321,9 +1296,11 @@ class EMXEFlutterApi(http.Controller):
             user = request.env.user
             offset = kw.get('index') if kw.get('index') else 0
             limit = kw.get('offset') if kw.get('offset') else 80
+            all_trip_ids = request.env['hc.trip'].search(
+                [('driver_id', '=', user.id), ('state', 'in', ['payment', 'done'])])
             trip_ids = request.env['hc.trip'].search(
                 [('driver_id', '=', user.id), ('state', 'in', ['payment', 'done'])], offset=offset, limit=limit, order='id desc')
-            driver_salary = sum(trip_ids.mapped('driver_salary'))
+            driver_salary = sum(all_trip_ids.mapped('driver_salary')) + sum(all_trip_ids.mapped('driver_cost_ids.payment_amount'))
             transactions = []
             for trip in trip_ids:
                 # driver_advance = sum(trip.cost_payment_detail_ids.filtered(lambda x: x.paid_cost_id.name == 'Tạm ứng cho lái xe').mapped('payment_amount'))
@@ -1334,6 +1311,13 @@ class EMXEFlutterApi(http.Controller):
                         'amount': trip.driver_salary,
                         'datetime': trip.end_time + timedelta(hours=7) if trip.end_time else '',
                         'description': f'Lái xe nhận tiền từ chuyến {trip.hc_code}',
+                    })
+                for cost in trip.driver_cost_ids:
+                    transactions.append({
+                        'type': 'debit',
+                        'amount': cost.payment_amount,
+                        'datetime': cost.create_date + timedelta(hours=7),
+                        'description': f'Lái xe chi tiền cho {cost.driver_cost_id.name} từ chuyến {trip.hc_code}',
                     })
             return {
                 "status": "success",
@@ -1363,6 +1347,7 @@ class EMXEFlutterApi(http.Controller):
             unit_cost = params.get('unit_cost')
             oil_size = params.get('oil_size')
             odo = params.get('odo')
+            image = params.get('image')
             if not vehicle_no:
                 return {
                     "status": "fail",
@@ -1419,6 +1404,7 @@ class EMXEFlutterApi(http.Controller):
                 'date': datetime.today(),
                 'start_km': odo,
                 'user_id': user.id,
+                'image': image if image else False,
             })
             return {
                 "status": "success",
