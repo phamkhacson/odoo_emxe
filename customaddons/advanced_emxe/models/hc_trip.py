@@ -286,7 +286,7 @@ class HcTrip(models.Model):
                 rec.message_post(body=message, message_type='notification', partner_ids=[rec.driver_id.partner_id.id])
 
                 data = {
-                    'record_id': rec.id,
+                    'record_id': str(rec.id),
                     'type': 'dieu_chuyen'
                 }
                 notification = {
@@ -311,7 +311,7 @@ class HcTrip(models.Model):
             message = (f'Chuyến đi {pick_up_place} - {destination} của bạn đã được hoàn thành. Vào trang báo cáo để hoàn thiện chi phí chuyến đi.')
             rec.message_post(body=message, message_type='notification', partner_ids=[rec.driver_id.partner_id.id])
             data = {
-                'record_id': rec.id,
+                'record_id': str(rec.id),
                 'type': 'noti'
             }
             notification = {
@@ -331,7 +331,7 @@ class HcTrip(models.Model):
                 f'Chuyến đi {pick_up_place} - {destination} của bạn đã được thanh toán. Xem chi tiết ở trang cá nhân')
             rec.message_post(body=message, message_type='notification', partner_ids=[rec.driver_id.partner_id.id])
             data = {
-                'record_id': rec.id,
+                'record_id': str(rec.id),
                 'type': 'noti'
             }
             notification = {
@@ -450,7 +450,7 @@ class HcTrip(models.Model):
             pick_up_place = trip.pick_up_place if trip.pick_up_place else ''
             destination = trip.destination if trip.destination else ''
             data = {
-                'record_id': trip.id,
+                'record_id': str(trip.id),
                 'type': 'sap_khoi_hanh'
             }
             notification = {

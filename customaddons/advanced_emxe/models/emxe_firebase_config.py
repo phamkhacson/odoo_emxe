@@ -59,8 +59,10 @@ class EMXEFirebaseConfig(models.Model):
             #                 "title": "emxe TITLE"
             #             }
             try:
+                firebase_app = self.env['emxe.firebase.config'].sudo().search([], limit=1)
                 firebase_data = json.loads(
-                            base64.b64decode(self.firebase_admin_key_file).decode())
+                    base64.b64decode(firebase_app.firebase_admin_key_file).decode())
+                ## todo check validate các biến tokens, data, notification
                 firebase_credentials = service_account.Credentials.from_service_account_info(
                     firebase_data,
                     scopes=['https://www.googleapis.com/auth/firebase.messaging']
