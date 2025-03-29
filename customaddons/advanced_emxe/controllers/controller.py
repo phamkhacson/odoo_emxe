@@ -484,14 +484,19 @@ class EMXEFlutterApi(http.Controller):
                 trip = request.env['hc.trip'].search([('id', '=', int(id))])
                 if trip:
                     payment_status = ''
-                    if trip.remain_customer_amount > 0:
-                        if trip.remain_customer_amount != trip.customer_amount:
-                            payment_status = 2
-
-                        else:
-                            payment_status = 1
+                    has_paid = sum(trip.income_detail_ids.filtered(lambda x: x.income_id.name in ['Lái xe thu tiền', 'Khách hàng thanh toán']))
+                    if has_paid > 0:
+                        payment_status = 2
                     else:
-                        payment_status = 3
+                        payment_status = 1
+                    # if trip.remain_customer_amount > 0:
+                    #     if trip.remain_customer_amount != trip.customer_amount:
+                    #         payment_status = 2
+                    #
+                    #     else:
+                    #         payment_status = 1
+                    # else:
+                    #     payment_status = 3
 
                     result = {
                         "id": trip.id,
