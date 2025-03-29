@@ -63,7 +63,7 @@
                     <field name="license_plate"/>
                     <field name="type"/>
                     <field name="own_vehicle_id"/>
-                    <field name="driver_id"/>
+                    <field name="driver_ids" widget="many2many_tags"/>
                     <field name="state"/>
                 </tree>
             </field>
@@ -406,8 +406,10 @@
                                 <field name="tour_guide_phone" readonly="0"/>
                                 <field name="vehicle_type_id" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="transport_vendor_id" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
-                                <field name="vehicle_id" options="{'no_open': True}" attrs="{'readonly':['|', ('state','!=', 'draft'), ('transport_vendor_id','=', False)]}"/>
-                                <field name="driver_id" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="vehicle_id" domain="[('id', 'in', valid_vehicle_domain)]" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
+                                <field name="valid_vehicle_domain" invisible="1"/>
+                                <field name="driver_ids" invisible="1"/>
+                                <field name="driver_id" domain="[('id', 'in', driver_ids)]" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="driver_phone" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="driver_accept"/>
                                 <field name="series_id" options="{'no_open': True}" readonly="0"/>
@@ -530,7 +532,7 @@
             <field name="arch" type="xml">
                 <tree>
                     <field name="hc_code"/>
-                    <field name="display_dealer_id"/>
+<!--                    <field name="display_dealer_id"/>-->
                     <field name="date_start"/>
                     <field name="pick_up_place"/>
                 </tree>
@@ -564,7 +566,7 @@
                         <group>
                             <field name="hc_code" readonly="1"/>
                             <field name="is_common_info" attrs="{'readonly': [('state', '!=', 'draft')]}"/>
-                            <field name="dealer_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
+<!--                            <field name="dealer_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>-->
                             <field name="transport_vendor_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="vehicle_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
                             <field name="driver_id" options="{'no_open': True}" attrs="{'invisible': [('is_common_info', '=', True)], 'required': [('is_common_info', '=', False)], 'readonly': [('state', '!=', 'draft')]}"/>
@@ -575,7 +577,7 @@
                                 <tree create="false" delete="false" editable="bottom">
                                     <field name="hc_code" readonly="1"/>
                                     <field name="state" invisible="1"/>
-                                    <field name="dealer_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
+<!--                                    <field name="dealer_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>-->
                                     <field name="transport_vendor_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                                     <field name="vehicle_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>
                                     <field name="driver_id" options="{'no_open': True}" attrs="{'readonly': ['|', ('state', '!=', 'draft'), ('parent.is_common_info', '=', False)]}" force_save="True"/>

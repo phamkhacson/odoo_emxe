@@ -38,8 +38,10 @@ class HcTrip(models.Model):
     transport_vendor_id = fields.Many2one('hc.transport.vendor', string="Nhà xe")
     vehicle_type_id = fields.Many2one('hc.vehicle.type', string="Loại xe")
     vehicle_id = fields.Many2one('hc.vehicle', string="Xe")
+    valid_vehicle_domain = fields.Many2many('hc.vehicle', string="Xe hợp lệ", compute='_compute_valid_vehicle_domain', store=True)
     license_plate = fields.Char(string="Biển kiểm soát", related="vehicle_id.license_plate")
-    driver_id = fields.Many2one('res.users', string="Tài xế", related="vehicle_id.driver_id", store=True)
+    driver_id = fields.Many2one('res.users', string="Tài xế")
+    driver_ids = fields.Many2many('res.users', string="Tài xế", related="vehicle_id.driver_ids")
     driver_phone = fields.Char(string="SĐT tài xế", related="driver_id.phone")
     pick_up_place = fields.Char(string="Điểm đón khách")
     destination = fields.Char(string="Điểm trả khách")
@@ -68,6 +70,14 @@ class HcTrip(models.Model):
     total_time_actual = fields.Integer('Thời gian di chuyển thực tế', compute="compute_total_time_actual", store=True)
     distance_actual = fields.Float('Quãng đường thực tế', compute="compute_distance_actual", store=True)
     batch_id = fields.Many2one('hc.trip.batch', 'Chuyến gộp')
+
+    @api.depends('transport_vendor_id')
+    def _compute_valid_vehicle_domain(self):
+        for rec in self:
+            if rec.transport_vendor_id:
+                rec.valid_vehicle_domain = rec.transport_vendor_id.vehicle_ids
+            else:
+                rec.valid_vehicle_domain = self.env['hc.vehicle'].search([])
 
     @api.depends('locate_list')
     def compute_distance_actual(self):
@@ -345,6 +355,13 @@ class HcTrip(models.Model):
         for rec in self:
             rec.sudo().state = 'cancel'
 
+    def action_draft_trip(self):
+        for rec in self:
+            rec.sudo().write({
+                'state': 'draft',
+                'driver_accept': False
+            })
+
     def send_notify_to_dealer(self):
         mail_template = self.env.ref('advanced_emxe.hc_mail_template_create_trip')
         for rec in self:
@@ -437,10 +454,24 @@ class HcTrip(models.Model):
     @api.onchange('transport_vendor_id')
     def _onchange_transport_vendor_id(self):
         if self.transport_vendor_id:
-            if self.env.user.has_group('advanced_emxe.hc_group_operator') and self.env.user.transport_vendor_id and self.env.user.transport_vendor_id.id == self.env.ref('advanced_emxe.hc_transport_vendor_hoang_chau').id:
-                return {'domain': {'vehicle_id': [('id', '!=', False)]}}
+            self.vehicle_id = self.transport_vendor_id.vehicle_ids[0].id if self.transport_vendor_id.vehicle_ids else False
+            # if self.env.user.has_group('advanced_emxe.hc_group_operator') and self.env.user.transport_vendor_id and self.env.user.transport_vendor_id.id == self.env.ref('advanced_emxe.hc_transport_vendor_hoang_chau').id:
+            #     return {'domain': {'vehicle_id': [('id', '!=', False)]}}
+            # else:
+            #     return {'domain': {'vehicle_id': [('own_vehicle_id', '=', self.transport_vendor_id.id)]}}
+
+    @api.onchange('vehicle_id')
+    def _onchange_vehicle_id(self):
+        if self.vehicle_id:
+            if not self.transport_vendor_id:
+                self.transport_vendor_id = self.own_vehicle_id
+            if self.vehicle_id.driver_ids:
+                self.driver_id = self.vehicle_id.driver_ids[0].id
             else:
-                return {'domain': {'vehicle_id': [('own_vehicle_id', '=', self.transport_vendor_id.id)]}}
+                self.driver_id = False
+        else:
+            self.driver_id = False
+
 
     def cron_trip_start_noti(self):
         now = datetime.now()

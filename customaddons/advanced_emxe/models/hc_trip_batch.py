@@ -21,7 +21,7 @@ class HcTripBatch(models.Model):
     transport_vendor_id = fields.Many2one('hc.transport.vendor', string="Nhà xe")
     dealer_id = fields.Many2one('hc.dealer', string="Đại lý")
     vehicle_id = fields.Many2one('hc.vehicle', string="Xe")
-    driver_id = fields.Many2one('res.users', string="Tài xế", related="vehicle_id.driver_id", store=True)
+    driver_id = fields.Many2one('res.users', string="Tài xế", store=True)
     driver_phone = fields.Char(string="SĐT tài xế", related="driver_id.phone")
     hc_trip_ids = One2many('hc.trip', 'batch_id', string="Lịch trình")
     date_start = fields.Datetime(string="Ngày bắt đầu", compute='_compute_start', store=True)
@@ -50,11 +50,13 @@ class HcTripBatch(models.Model):
     def button_confirm(self):
         self.state = 'confirm'
         message = f'Đã điều chuyến xe gộp mã: {self.hc_code}'
-        self.message_post(body=message, message_type='comment')
         # confirm only the trips that are in draft state
         draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
         if draft_trip_ids:
             draft_trip_ids.confirm_trip()
+        else:
+            message = 'Tất cả chuyến đã được điều chuyến'
+        self.message_post(body=message, message_type='comment')
 
     def action_view_trip(self):
         return {
@@ -72,12 +74,18 @@ class HcTripBatch(models.Model):
         if not self.is_common_info:
             draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
             for trip in draft_trip_ids:
-                trip.sudo().update({
-                    'dealer_id': self.dealer_id,
-                    'transport_vendor_id': self.transport_vendor_id,
-                    'vehicle_id': self.vehicle_id,
-                    'driver_id': self.driver_id
-                })
+                if self.transport_vendor_id:
+                    trip.transport_vendor_id = self.transport_vendor_id
+                if self.vehicle_id:
+                    trip.vehicle_id = self.vehicle_id
+                if self.driver_id:
+                    trip.driver_id = self.driver_id
+                # trip.sudo().update({
+                #     # 'dealer_id': self.dealer_id,
+                #     'transport_vendor_id': self.transport_vendor_id,
+                #     'vehicle_id': self.vehicle_id,
+                #     'driver_id': self.driver_id
+                # })
 
     @api.onchange('transport_vendor_id')
     def onchange_transport_vendor_id(self):
@@ -100,10 +108,10 @@ class HcTripBatch(models.Model):
             for trip in draft_trip_ids:
                 trip.driver_id = self.driver_id
 
-    @api.onchange('dealer_id')
-    def onchange_dealer_id(self):
-        if not self.is_common_info:
-            draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
-            for trip in draft_trip_ids:
-                trip.dealer_id = self.dealer_id
+    # @api.onchange('dealer_id')
+    # def onchange_dealer_id(self):
+    #     if not self.is_common_info:
+    #         draft_trip_ids = self.hc_trip_ids.filtered(lambda trip: trip.state == 'draft')
+    #         for trip in draft_trip_ids:
+    #             trip.dealer_id = self.dealer_id
 

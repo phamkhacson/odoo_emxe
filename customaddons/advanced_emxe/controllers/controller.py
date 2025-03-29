@@ -591,10 +591,7 @@ class EMXEFlutterApi(http.Controller):
                 if accept:
                     trip.sudo().driver_accept = True
                 else:
-                    trip.sudo().write({
-                        'state': 'draft',
-                        'driver_accept': False
-                    })
+                    trip.sudo().action_draft_trip()
                     if trip.operator_id:
                         hc_code = trip.hc_code if trip.hc_code else ''
                         message = f'Chuyến xe {hc_code} đã bị tài xế từ chối nhận'
@@ -1774,10 +1771,11 @@ class EMXEFlutterApi(http.Controller):
             message_list = []
             offset = kw.get('index') if kw.get('index') else 0
             limit = kw.get('offset') if kw.get('offset') else 80
+            trip_ids = request.env['hc.trip'].search([('driver_id', '=', user.id), ('state', 'in', ['waiting', 'processing', 'payment', 'done'])])
             if user.partner_id:
                 message = request.env['mail.message'].search(
                     [('partner_ids', 'in', user.partner_id.id), ('message_type', '=', 'notification'),
-                     ('model', 'in', ['hc.trip'])], offset=offset, limit=limit, order='id desc')
+                     ('model', 'in', ['hc.trip']), ('res_id', 'in', trip_ids.ids)], offset=offset, limit=limit, order='id desc')
                 print(message)
                 if len(message) > 0:
                     for mess in message:
