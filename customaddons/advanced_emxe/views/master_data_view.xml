@@ -411,7 +411,7 @@
                                 <field name="driver_ids" invisible="1"/>
                                 <field name="driver_id" domain="[('id', 'in', driver_ids)]" options="{'no_open': True}" attrs="{'readonly':[('state','!=', 'draft')]}"/>
                                 <field name="driver_phone" attrs="{'readonly':[('state','!=', 'draft')]}"/>
-                                <field name="driver_accept"/>
+                                <field name="driver_accept" readonly="1"/>
                                 <field name="series_id" options="{'no_open': True}" readonly="0"/>
                                 <field name="start_time"/>
                                 <field name="end_time"/>
@@ -432,7 +432,7 @@
                                 <field name="end_time_actual"/>
                                 <field name="trip_pause_time"/>
                                 <field name="pause_time_count"/>
-                                <field name="locate_list"/>
+                                <field name="locate_list" invisible="1"/>
                                 <field name="distance_actual"/>
                             </group>
                         </group>

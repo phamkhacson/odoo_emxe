@@ -187,6 +187,52 @@ class EMXEFlutterApi(http.Controller):
                 }
             }
 
+    @http.route('/emxe_api/get_phone_email', type='json', auth="none")
+    def get_phone_email(self, **kw):
+        try:
+            user = kw.get('user')
+            if not user:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu user",
+                    "data": {
+                        "success": False
+                    }
+                }
+            if '@gmail.com' in user:
+                odoo_user = request.env['res.users'].sudo().search([('login', '=', user)], limit=1)
+            else:
+                odoo_user = request.env['res.users'].sudo().search([('phone', '=', user)], limit=1)
+            if odoo_user:
+                return {
+                    "status": "success",
+                    "code": 200,
+                    "message": "success",
+                    "data": {
+                        "email": odoo_user.login,
+                        "phone": odoo_user.phone,
+                    }
+                }
+            else:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thông tin không hợp lệ",
+                    "data": {
+                        "success": False
+                    }
+                }
+        except Exception as e:
+            return {
+                "status": "fail",
+                "code": 400,
+                "message": e,
+                "data": {
+                    "success": False
+                }
+            }
+
     @http.route('/emxe_api/get_employee_profile', auth='user', csrf=False, type='json')
     def get_employee_profile(self, **kw):
         try:
@@ -928,7 +974,7 @@ class EMXEFlutterApi(http.Controller):
                     }
                 }
             bank_acc_id = hc_vendor_id.bank_account_ids[0]
-            qr_code = f'https://img.vietqr.io/image/{bank_acc_id.bank_name}-{bank_acc_id.name}-compact2.png?amount={amount}&addInfo=thanh+toan+chuyen+xe+{trip_id.hc_code}'
+            qr_code = f'https://img.vietqr.io/image/{bank_acc_id.bank_name}-{bank_acc_id.name}-compact2.png?amount={amount}&addInfo={trip_id.hc_code}'
 
             return {
                 'status': 'success',
@@ -1302,7 +1348,8 @@ class EMXEFlutterApi(http.Controller):
                 [('driver_id', '=', user.id), ('state', 'in', ['payment', 'done'])])
             trip_ids = request.env['hc.trip'].search(
                 [('driver_id', '=', user.id), ('state', 'in', ['payment', 'done'])], offset=offset, limit=limit, order='id desc')
-            driver_salary = sum(all_trip_ids.mapped('driver_salary')) + sum(all_trip_ids.mapped('driver_cost_ids.payment_amount'))
+            all_credit_cost = all_trip_ids.cost_payment_detail_ids.filtered(lambda x: x.paid_cost_id.name in ['Tạm ứng cho lái xe', 'Tất toán cho lái xe'])
+            driver_salary = sum(all_trip_ids.mapped('driver_salary')) + sum(all_trip_ids.mapped('driver_cost_ids.payment_amount')) - sum(all_credit_cost.mapped('payment_amount'))
             transactions = []
             for trip in trip_ids:
                 # driver_advance = sum(trip.cost_payment_detail_ids.filtered(lambda x: x.paid_cost_id.name == 'Tạm ứng cho lái xe').mapped('payment_amount'))
@@ -1315,12 +1362,21 @@ class EMXEFlutterApi(http.Controller):
                         'description': f'Lái xe nhận tiền từ chuyến {trip.hc_code}',
                     })
                 for cost in trip.driver_cost_ids:
-                    transactions.append({
-                        'type': 'debit',
-                        'amount': cost.payment_amount,
-                        'datetime': cost.create_date + timedelta(hours=7),
-                        'description': f'Lái xe chi tiền cho {cost.driver_cost_id.name} từ chuyến {trip.hc_code}',
-                    })
+                    if cost.payment_amount > 0:
+                        transactions.append({
+                            'type': 'debit',
+                            'amount': cost.payment_amount,
+                            'datetime': cost.create_date + timedelta(hours=7),
+                            'description': f'Lái xe chi tiền cho {cost.driver_cost_id.name} từ chuyến {trip.hc_code}',
+                        })
+                for cost in trip.cost_payment_detail_ids:
+                    if cost.paid_cost_id.name in ['Tạm ứng cho lái xe', 'Tất toán cho lái xe'] and cost.payment_amount > 0:
+                        transactions.append({
+                            'type': 'credit',
+                            'amount': cost.payment_amount,
+                            'datetime': cost.create_date + timedelta(hours=7),
+                            'description': f'Lái xe nhận tiền từ {cost.paid_cost_id.name} từ chuyến {trip.hc_code}',
+                        })
             return {
                 "status": "success",
                 "code": 200,
