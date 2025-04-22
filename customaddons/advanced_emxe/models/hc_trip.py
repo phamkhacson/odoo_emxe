@@ -8,15 +8,16 @@ from odoo.exceptions import UserError
 
 import math
 
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6371
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(
-        dlon / 2) * math.sin(dlon / 2)
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    d = R * c
-    return round(d, 2)
+from haversine import haversine, Unit
+
+def calculate_distance(lat1, lon1, lat2, lon2):
+    # Define the two points as tuples
+    point1 = (lat1, lon1)
+    point2 = (lat2, lon2)
+
+    # Calculate the distance in kilometers
+    distance = haversine(point1, point2, unit=Unit.KILOMETERS)
+    return round(distance, 2)
 
 
 class HcTrip(models.Model):
@@ -87,8 +88,8 @@ class HcTrip(models.Model):
                 locate_list = eval(rec.locate_list)
                 if len(locate_list) > 1:
                     for i in range(1, len(locate_list)):
-                        if not locate_list[i-1]['is_pause']:
-                            distance_actual += haversine(locate_list[i-1]['latitude'], locate_list[i-1]['longitude'], locate_list[i]['latitude'], locate_list[i]['longitude'])
+                        if 'is_pause' not in locate_list[i-1] or 'is_pause' in locate_list[i-1] and not locate_list[i-1]['is_pause']:
+                            distance_actual += calculate_distance(locate_list[i-1]['latitude'], locate_list[i-1]['longitude'], locate_list[i]['latitude'], locate_list[i]['longitude'])
             rec.distance_actual = distance_actual
 
     def unlink(self):

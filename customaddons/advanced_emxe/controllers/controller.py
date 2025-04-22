@@ -7,17 +7,17 @@ import logging
 import math
 import requests
 import re
+from haversine import haversine, Unit
 
+def calculate_distance(lat1, lon1, lat2, lon2):
+    # Define the two points as tuples
+    point1 = (lat1, lon1)
+    point2 = (lat2, lon2)
 
-def haversine(lat1, lon1, lat2, lon2):
-    R = 6371
-    dlat = math.radians(lat2 - lat1)
-    dlon = math.radians(lon2 - lon1)
-    a = math.sin(dlat / 2) * math.sin(dlat / 2) + math.cos(math.radians(lat1)) * math.cos(math.radians(lat2)) * math.sin(
-        dlon / 2) * math.sin(dlon / 2)
-    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
-    d = R * c
-    return round(d, 2)
+    # Calculate the distance in kilometers
+    distance = haversine(point1, point2, unit=Unit.KILOMETERS)
+    return round(distance, 2)
+
 
 def _create_flutter_log(env, name=None, type=None, description=None):
     """
@@ -1734,9 +1734,9 @@ class EMXEFlutterApi(http.Controller):
             locate_list = eval(trip.locate_list) if trip.locate_list else []
             last_distance = 0
             for i in range(len(locate_list)):
-                if not locate_list[len(locate_list) - i - 1]['is_pause']:
+                if 'is_pause' in locate_list[len(locate_list) - i - 1] and not locate_list[len(locate_list) - i - 1]['is_pause']:
                     last_locate = locate_list[len(locate_list) - i - 1]
-                    last_distance = haversine(last_locate['latitude'], last_locate['longitude'], latitude, longitude)
+                    last_distance = calculate_distance(last_locate['latitude'], last_locate['longitude'], latitude, longitude)
                     break
             locate_list.append({
                 'latitude': latitude,

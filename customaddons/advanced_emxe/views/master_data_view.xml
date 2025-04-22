@@ -379,7 +379,7 @@
                         <button name="send_notify_to_dealer" string="Gửi thông báo cho đại lý" type="object" class="oe_highlight"/>
                         <button name="mark_as_processing" string="Thực hiện" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
                         <button name="mark_as_payment" string="Hoàn thành chuyến" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'processing')]}"/>
-                        <button name="mark_as_done" string="Hoàn thành thanh toán" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'payment')]}"/>
+                        <button name="mark_as_done" string="Duyệt chi" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'payment')]}"/>
                         <button name="action_cancel_trip" string="Hủy chuyến" type="object" class="oe_highlight" attrs="{'invisible': [('state', '=', 'cancel')]}"/>
                         <field name="state" widget="statusbar"/>
                     </header>
@@ -459,7 +459,7 @@
                                 </field>
                             </page>
                             <page string="Chi" name="cost" groups="advanced_emxe.hc_group_accountant,base.group_system">
-                                <h3>Chi phí đã chi cho nhà xe</h3>
+                                <h3>Chi phí cho nhà xe</h3>
                                 <field name="cost_detail_ids" nolabel="1">
                                     <tree editable="bottom" default_order="sequence">
                                         <field name="sequence" attrs="{'column_invisible': True}"/>
