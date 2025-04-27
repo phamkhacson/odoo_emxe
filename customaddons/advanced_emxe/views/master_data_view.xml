@@ -434,6 +434,7 @@
                                 <field name="pause_time_count"/>
                                 <field name="locate_list" invisible="1"/>
                                 <field name="distance_actual"/>
+                                <field name="manual_distance"/>
                             </group>
                         </group>
                         <notebook>

@@ -1225,6 +1225,17 @@ class EMXEFlutterApi(http.Controller):
                         "success": False
                     }
                 }
+            km = kw.get('km')
+            if not km:
+                return {
+                    "status": "fail",
+                    "code": 400,
+                    "message": "Thiếu km",
+                    "data": {
+                        "success": False
+                    }
+                }
+            trip_id.manual_distance = float(km)
             for cost in costs:
                 type = cost.get('type')
                 if not type:

@@ -70,6 +70,7 @@ class HcTrip(models.Model):
     pause_time_count = fields.Integer('Thời gian tạm dừng chuyến')
     total_time_actual = fields.Integer('Thời gian di chuyển thực tế', compute="compute_total_time_actual", store=True)
     distance_actual = fields.Float('Quãng đường thực tế', compute="compute_distance_actual", store=True)
+    manual_distance = fields.Float(string="Quãng đường nhập tay")
     batch_id = fields.Many2one('hc.trip.batch', 'Chuyến gộp')
 
     @api.depends('transport_vendor_id')
