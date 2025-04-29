@@ -1237,6 +1237,9 @@ class EMXEFlutterApi(http.Controller):
                     }
                 }
             trip_id.manual_distance = float(km)
+            note = kw.get('note')
+            if note:
+                trip_id.message_post(body=note)
             for cost in costs:
                 type = cost.get('type')
                 if not type:
