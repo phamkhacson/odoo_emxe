@@ -13,3 +13,4 @@ class ResUsers(models.Model):
     emxe_gender = fields.Selection([
         ('male', 'Nam'), ('female', 'Nữ')], index=True,
         default='male', string='Giới tính')
+    chatter_position = fields.Char(string="Chức vụ")
