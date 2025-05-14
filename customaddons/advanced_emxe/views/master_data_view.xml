@@ -303,6 +303,7 @@
                     <field name="dealer_id"/>
                     <field name="hc_code"/>
                     <field name="series_id"/>
+                    <field name="state"/>
                     <field name="pick_up_place"/>
                     <field name="destination"/>
                     <field name="start_time"/>

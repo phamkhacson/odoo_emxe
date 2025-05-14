@@ -466,7 +466,7 @@ class HcTrip(models.Model):
     def _onchange_vehicle_id(self):
         if self.vehicle_id:
             if not self.transport_vendor_id:
-                self.transport_vendor_id = self.own_vehicle_id
+                self.transport_vendor_id = self.vehicle_id.own_vehicle_id
             if self.vehicle_id.driver_ids:
                 self.driver_id = self.vehicle_id.driver_ids[0].id
             else:

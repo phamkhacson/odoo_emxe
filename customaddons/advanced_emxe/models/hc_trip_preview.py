@@ -31,7 +31,7 @@ class HcTripPreview(models.Model):
     vehicle_type_id = fields.Many2one('hc.vehicle.type', string="Loại xe")
     dealer_id = fields.Many2one('hc.dealer', string="Đại lý")
     series_id = fields.Many2one('hc.trip.series', string="Series chuyến")
-    schedule_ids = fields.One2many('hc.trip.schedule', 'preview_id', string='Lịch trình')
+    schedule_ids = fields.One2many('hc.trip.schedule', 'preview_id', string='Lịch trình', copy=True)
     trip_ids = fields.One2many('hc.trip', 'source_id', string='Chuyến')
     state = fields.Selection([('draft', 'Nháp'), ('confirm', 'Xác nhận')], string="Trạng thái", default='draft')
     pick_up_place = fields.Char(string="Điểm đón khách", compute='_compute_pick_up_place', store=True)
