@@ -15,3 +15,4 @@ class HcTripEntryConfig(models.Model):
     is_freight_cost = fields.Boolean(string="Là cước vận tải", default=False, help="Dùng cho cấu hình các khoản thu")
     entry_type = fields.Selection([('cost', 'Khoản chi'), ('paid_cost', 'Khoản đã chi'), ('income', 'Khoản thu'), ('payment_income', 'Khoản đã thu'), ('operation_cost', 'Chi phí vận hành nội bộ'), ('driver_cost', 'Khoản lái xe đã chi')], string="Loại phát sinh")
     sequence = fields.Integer(string="Thứ tự hiển thị", default=99)
+    cost_type_ids = fields.Many2many('entry.cost.type', string="Hiển thị tại")

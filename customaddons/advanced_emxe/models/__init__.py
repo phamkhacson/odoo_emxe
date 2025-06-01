@@ -31,3 +31,4 @@ from . import emxe_mobile_registration_token
 from . import hc_trip_batch
 from . import hc_otp
 from . import hc_vendor_review
+from . import entry_cost_type

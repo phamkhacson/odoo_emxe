@@ -68,6 +68,7 @@
                         <group>
                             <field name="name"/>
                             <field name="type_id" options="{'no_open': True}"/>
+                            <field name="cost_type_ids" widget="many2many_tags" options="{'no_open': True 'no_create': True}"/>
                             <field name="note"/>
                             <field name="sequence"/>
                         </group>

@@ -377,11 +377,12 @@
                 <form>
                     <header>
                         <button name="confirm_trip" string="Điều xe" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'draft')]}"/>
-                        <button name="send_notify_to_dealer" string="Gửi thông báo cho đại lý" type="object" class="oe_highlight"/>
                         <button name="mark_as_processing" string="Thực hiện" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
                         <button name="mark_as_payment" string="Hoàn thành chuyến" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'processing')]}"/>
                         <button name="mark_as_done" string="Duyệt chi" type="object" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'payment')]}"/>
-                        <button name="action_cancel_trip" string="Hủy chuyến" type="object" class="oe_highlight" attrs="{'invisible': [('state', '=', 'cancel')]}"/>
+                        <button name="change_driver" string="Thay đổi lái xe" type="object" class="btn btn-secondary" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
+                        <button name="send_notify_to_dealer" string="Gửi thông báo cho đại lý" type="object" class="btn btn-secondary"/>
+                        <button name="action_cancel_trip" string="Hủy chuyến" type="object" class="btn btn-secondary" attrs="{'invisible': [('state', '=', 'cancel')]}"/>
                         <field name="state" widget="statusbar"/>
                     </header>
                     <sheet>
@@ -429,6 +430,9 @@
                                 <field name="net_profit"/>
                                 <field name="operation_cost_amount"/>
                                 <field name="driver_salary" attrs="{'invisible':[('transport_vendor_id','!=', 1)]}"/>
+                                <field name="driver_paid_amount" attrs="{'invisible':[('transport_vendor_id','!=', 1)]}"/>
+                                <field name="driver_prepaid_amount" attrs="{'invisible':[('transport_vendor_id','!=', 1)]}"/>
+                                <field name="driver_balance" attrs="{'invisible':[('transport_vendor_id','!=', 1)]}"/>
                                 <field name="start_time_actual"/>
                                 <field name="end_time_actual"/>
                                 <field name="trip_pause_time"/>

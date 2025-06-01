@@ -73,6 +73,18 @@ class HcTrip(models.Model):
     manual_distance = fields.Float(string="Quãng đường nhập tay")
     batch_id = fields.Many2one('hc.trip.batch', 'Chuyến gộp')
 
+    def change_driver(self):
+        view_id = self.env.ref('advanced_emxe.wizard_change_driver_view_form').id
+        return {
+            'name': 'Thay đổi tài xế',
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'wizard.change.driver',
+            'view_id': view_id,
+            'target': 'new',
+            'context': {'default_trip_id': self.id},
+        }
+
     @api.depends('transport_vendor_id')
     def _compute_valid_vehicle_domain(self):
         for rec in self:
@@ -130,7 +142,8 @@ class HcTrip(models.Model):
             rec.sudo().other_cost = other_cost
 
     def _default_income_detail_ids(self):
-        income_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['income', 'operation_cost'])])
+        cost_type = self.env.ref('advanced_emxe.entry_cost_type_income')
+        income_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['income', 'operation_cost']) and ('cost_type_ids', 'in', cost_type.id)])
         if income_ids:
             vals = []
             for income in income_ids:
@@ -144,7 +157,8 @@ class HcTrip(models.Model):
             return False
 
     def _default_income_payment_detail_ids(self):
-        payment_income_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['payment_income', 'operation_cost'])])
+        cost_type = self.env.ref('advanced_emxe.entry_cost_type_payment_income')
+        payment_income_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['payment_income', 'operation_cost']) and ('cost_type_ids', 'in', cost_type.id)])
         if payment_income_ids:
             vals = []
             for payment_income in payment_income_ids:
@@ -157,7 +171,8 @@ class HcTrip(models.Model):
             return False
 
     def _default_cost_detail_ids(self):
-        cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['cost', 'operation_cost'])])
+        cost_type = self.env.ref('advanced_emxe.entry_cost_type_cost')
+        cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['cost', 'operation_cost']) and ('cost_type_ids', 'in', cost_type.id)])
         if cost_ids:
             vals = []
             for cost in cost_ids:
@@ -171,7 +186,8 @@ class HcTrip(models.Model):
             return False
 
     def _default_paid_cost_detail_ids(self):
-        paid_cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['paid_cost', 'operation_cost'])])
+        cost_type = self.env.ref('advanced_emxe.entry_cost_type_paid_cost')
+        paid_cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['paid_cost', 'operation_cost']) and ('cost_type_ids', 'in', cost_type.id)])
         if paid_cost_ids:
             vals = []
             for paid_cost in paid_cost_ids:
@@ -184,7 +200,8 @@ class HcTrip(models.Model):
             return False
 
     def _default_operation_cost_ids(self):
-        operation_cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', '=', 'operation_cost')])
+        cost_type = self.env.ref('advanced_emxe.entry_cost_type_operation_cost')
+        operation_cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', '=', 'operation_cost') and ('cost_type_ids', 'in', cost_type.id)])
         if operation_cost_ids:
             vals = []
             for operation_cost in operation_cost_ids:
@@ -197,7 +214,8 @@ class HcTrip(models.Model):
             return False
 
     def _default_driver_cost_ids(self):
-        driver_cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['operation_cost', 'driver_cost'])])
+        cost_type = self.env.ref('advanced_emxe.entry_cost_type_driver_cost')
+        driver_cost_ids = self.env['hc.trip.entry.config'].sudo().search([('entry_type', 'in', ['operation_cost', 'driver_cost']) and ('cost_type_ids', 'in', cost_type.id)])
         if driver_cost_ids:
             vals = []
             for driver_cost in driver_cost_ids:
@@ -219,8 +237,12 @@ class HcTrip(models.Model):
     driver_salary = fields.Float(string="Lương lái xe", compute='compute_amount_data', store=True)
     cost_submited = fields.Boolean(string="Đã gửi duyệt chi", default=False)
     locate_list = fields.Char(string="Danh sách định vị", default="[]")
+    driver_paid_amount = fields.Float(string="Lái xe đã chi", compute='compute_amount_data', store=True)
+    driver_prepaid_amount = fields.Float(string="Đã tạm ứng cho lái xe", compute='compute_amount_data', store=True)
+    driver_balance = fields.Float(string="Số dư lái xe", compute='compute_amount_data', store=True)
 
-    @api.depends('operation_cost_ids', 'income_detail_ids', 'income_detail_ids.amount', 'income_payment_detail_ids', 'income_payment_detail_ids.payment_amount', 'cost_detail_ids', 'cost_payment_detail_ids', 'vehicle_type_id', 'vehicle_type_id.driver_salary_percent')
+
+    @api.depends('driver_cost_ids', 'driver_cost_ids.payment_amount', 'operation_cost_ids', 'income_detail_ids', 'income_detail_ids.amount', 'income_payment_detail_ids', 'income_payment_detail_ids.payment_amount', 'cost_detail_ids', 'cost_payment_detail_ids', 'vehicle_type_id', 'vehicle_type_id.driver_salary_percent')
     def compute_amount_data(self):
         for rec in self:
             operation_cost_amount = 0
@@ -230,6 +252,15 @@ class HcTrip(models.Model):
             transport_vendor_amount = 0
             cost_payment = 0
             commission_fee = 0
+            driver_paid_amount = 0
+            driver_prepaid_amount = 0
+            payment_driver_advance_id = self.env['hc.trip.entry.config'].search(
+                [('name', '=', 'Tạm ứng cho lái xe')], limit=1)
+            if payment_driver_advance_id:
+                driver_prepaid_amount = sum(rec.cost_payment_detail_ids.filtered(
+                    lambda x: x.paid_cost_id == payment_driver_advance_id).mapped('payment_amount'))
+            for driver_cost_id in rec.driver_cost_ids:
+                driver_paid_amount += driver_cost_id.payment_amount
             for oc in rec.operation_cost_ids:
                 operation_cost_amount += oc.operation_cost_price
                 operation_cost_amount_exclude_oil += oc.operation_cost_price
@@ -246,6 +277,8 @@ class HcTrip(models.Model):
             driver_salary_percent = 0
             if rec.vehicle_type_id:
                 driver_salary_percent = rec.vehicle_type_id.driver_salary_percent
+            rec.sudo().driver_paid_amount = driver_paid_amount
+            rec.sudo().driver_prepaid_amount = driver_prepaid_amount
             rec.sudo().operation_cost_amount = operation_cost_amount
             rec.sudo().customer_amount = customer_amount
             rec.sudo().remain_customer_amount = customer_amount - customer_payment
@@ -254,6 +287,7 @@ class HcTrip(models.Model):
             rec.sudo().hc_revenue = customer_amount - transport_vendor_amount
             rec.sudo().net_profit = customer_amount - transport_vendor_amount - commission_fee
             rec.sudo().driver_salary = (transport_vendor_amount - operation_cost_amount_exclude_oil) * driver_salary_percent/100
+            rec.sudo().driver_balance = rec.sudo().driver_salary + driver_paid_amount - driver_prepaid_amount
 
     @api.depends('auction_ids')
     def _compute_auction_count(self):
@@ -303,7 +337,7 @@ class HcTrip(models.Model):
                 }
                 notification = {
                     'title': 'Bạn vừa được phân giao chuyến đi',
-                    'body': f'Bạn vừa được Quản trị viên phân giao chuyến đi {pick_up_place} - {destination} vào {rec.start_time.strftime("%d/%m/%Y %H:%M:%S")}. Click chấp nhận để nhận chuyến đi'
+                    'body': f'Bạn vừa được Quản trị viên phân giao chuyến đi {pick_up_place} - {destination} vào {start_time}. Click chấp nhận để nhận chuyến đi'
                 }
                 self.env['emxe.firebase.config'].sudo().send_fcm_notification(data=data, notification=notification, user_id=rec.driver_id)
 

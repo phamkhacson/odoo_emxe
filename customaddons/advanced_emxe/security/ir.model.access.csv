@@ -28,4 +28,6 @@ access_emxe_flutter_log,advanced_emxe.emxe_flutter_log,model_emxe_flutter_log,ba
 access_emxe_firebase_config,advanced_emxe.emxe_firebase_config,model_emxe_firebase_config,base.group_user,1,1,1,1
 access_emxe_hc_otp,advanced_emxe.emxe_hc_otp,model_hc_otp,base.group_user,1,1,1,1
 access_hc_vendor_review,advanced_emxe.hc_vendor_review,model_hc_vendor_review,base.group_user,1,1,1,1
+access_entry_cost_type,advanced_emxe.access_entry_cost_type,model_entry_cost_type,base.group_user,1,1,1,1
+access_wizard_change_driver,advanced_emxe.access_wizard_change_driver,model_wizard_change_driver,base.group_user,1,1,1,1
 access_emxe_mobile_registration_token,advanced_emxe.emxe_mobile_registration_token,model_emxe_mobile_registration_token,base.group_user,1,1,1,1

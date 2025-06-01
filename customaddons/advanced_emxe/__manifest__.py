@@ -8,6 +8,7 @@
     'data': [
         'data/hc_transport_vendor.xml',
         'data/mail_template.xml',
+        'data/entry_cost_type.xml',
         'security/group.xml',
         'security/rules.xml',
         'security/ir.model.access.csv',
@@ -20,5 +21,6 @@
         'views/emxe_mobile_registration_token_views.xml',
         'data/ir_cron_data.xml',
         'wizard/wizard_select_trip_data.xml',
+        'wizard/wizard_change_driver.xml',
     ],
 }
