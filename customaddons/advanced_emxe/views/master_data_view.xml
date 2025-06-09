@@ -425,11 +425,11 @@
                             </group>
                             <group groups="advanced_emxe.hc_group_accountant,base.group_system">
                                 <field name="customer_amount"/>
-                                <field name="remain_customer_amount" style="color: white; background-color: blue"/>
+                                <field name="remain_customer_amount" style="color: red"/>
                                 <field name="transport_vendor_amount"/>
 <!--                                <field name="hc_revenue"/>-->
                                 <field name="net_profit"/>
-                                <field name="operation_cost_amount" style="color: white; background-color: blue"/>
+                                <field name="operation_cost_amount" style="color: red"/>
                                 <field name="driver_receive_customer_amount"/>
                                 <field name="need_pay_remain"/>
                                 <field name="driver_salary" attrs="{'invisible':[('transport_vendor_id','!=', 1)]}"/>
@@ -663,7 +663,7 @@
             <field name="view_mode">tree,form</field>
         </record>
         <record id="payment_hc_trip_view_action" model="ir.actions.act_window">
-            <field name="name">Chuyến chờ chi phí</field>
+            <field name="name">Chuyến đã thực hiện</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">hc.trip</field>
             <field name="domain">[('state', '=', 'payment')]</field>
@@ -872,13 +872,13 @@
             </field>
         </record>
         <record id="hc_oil_management_action" model="ir.actions.act_window">
-            <field name="name">Quản lý dầu</field>
+            <field name="name">Lịch sử đổ dầu</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">hc.oil.management</field>
             <field name="view_mode">tree,form</field>
             <field name="context">{"search_default_group_by_vehicle": 1}</field>
         </record>
-        <menuitem id="hc_oil_management_menu" name="Quản lý dầu" parent="hc_vehicle_management_menu" action="hc_oil_management_action" sequence="20"/>
+        <menuitem id="hc_oil_management_menu" name="Lịch sử đổ dầu" parent="hc_vehicle_management_menu" action="hc_oil_management_action" sequence="20"/>
         <record id="hc_repair_management_view_tree" model="ir.ui.view">
             <field name="name">hc.repair.management.view.tree</field>
             <field name="model">hc.repair.management</field>
@@ -923,13 +923,13 @@
             </field>
         </record>
         <record id="hc_repair_management_action" model="ir.actions.act_window">
-            <field name="name">Quản lý sửa chữa</field>
+            <field name="name">Lịch sử sửa chữa</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">hc.repair.management</field>
             <field name="view_mode">tree,form</field>
             <field name="context">{"search_default_group_by_vehicle": 1}</field>
         </record>
-        <menuitem id="hc_repair_management_menu" name="Quản lý sửa chữa" parent="hc_vehicle_management_menu" action="hc_repair_management_action" sequence="25"/>
+        <menuitem id="hc_repair_management_menu" name="Lịch sử sửa chữa" parent="hc_vehicle_management_menu" action="hc_repair_management_action" sequence="25"/>
         <record id="hc_executive_group_view_tree" model="ir.ui.view">
             <field name="name">hc.executive.group.view.tree</field>
             <field name="model">hc.executive.group</field>

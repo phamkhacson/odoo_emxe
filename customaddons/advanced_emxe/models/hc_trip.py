@@ -193,7 +193,8 @@ class HcTrip(models.Model):
             for paid_cost in paid_cost_ids:
                 vals.append({
                     "paid_cost_id": paid_cost.id,
-                    "payment_amount": 0,
+                    "price": 0,
+                    "qty": 0,
                 })
             return [(0, 0, e) for e in vals]
         else:
@@ -207,7 +208,7 @@ class HcTrip(models.Model):
             for operation_cost in operation_cost_ids:
                 vals.append({
                     "operation_cost_id": operation_cost.id,
-                    "payment_amount": 0,
+                    "operation_cost_price": 0,
                 })
             return [(0, 0, e) for e in vals]
         else:
@@ -244,7 +245,7 @@ class HcTrip(models.Model):
     driver_receive_customer_amount = fields.Float(string="Lái xe đã thu", compute='compute_amount_data', store=True)
 
 
-    @api.depends('driver_cost_ids', 'driver_cost_ids.amount', 'operation_cost_ids', 'income_detail_ids', 'income_detail_ids.amount', 'income_payment_detail_ids', 'income_payment_detail_ids.amount', 'cost_detail_ids', 'cost_payment_detail_ids', 'vehicle_type_id', 'vehicle_type_id.driver_salary_percent')
+    @api.depends('driver_cost_ids', 'driver_cost_ids.payment_amount', 'operation_cost_ids', 'income_detail_ids', 'income_detail_ids.amount', 'income_payment_detail_ids', 'income_payment_detail_ids.payment_amount', 'cost_detail_ids', 'cost_detail_ids.amount', 'cost_payment_detail_ids', 'cost_payment_detail_ids.payment_amount', 'vehicle_type_id', 'vehicle_type_id.driver_salary_percent')
     def compute_amount_data(self):
         for rec in self:
             operation_cost_amount = 0
@@ -261,14 +262,14 @@ class HcTrip(models.Model):
                 [('name', '=', 'Tạm ứng cho lái xe')], limit=1)
             if payment_driver_advance_id:
                 driver_prepaid_amount = sum(rec.cost_payment_detail_ids.filtered(
-                    lambda x: x.paid_cost_id == payment_driver_advance_id).mapped('amount'))
+                    lambda x: x.paid_cost_id == payment_driver_advance_id).mapped('payment_amount'))
             payment_driver_receive_id = self.env['hc.trip.entry.config'].search(
                 [('name', '=', 'Lái xe thu tiền')], limit=1)
             if payment_driver_receive_id:
                 driver_receive_customer_amount = sum(rec.income_payment_detail_ids.filtered(
-                    lambda x: x.payment_income_id == payment_driver_receive_id).mapped('amount'))
+                    lambda x: x.payment_income_id == payment_driver_receive_id).mapped('payment_amount'))
             for driver_cost_id in rec.driver_cost_ids:
-                driver_paid_amount += driver_cost_id.amount
+                driver_paid_amount += driver_cost_id.payment_amount
             for oc in rec.operation_cost_ids:
                 if oc.operation_cost_id and oc.operation_cost_id.name and not 'Cao tốc' in oc.operation_cost_id.name:
                     operation_cost_amount += oc.operation_cost_price
@@ -278,11 +279,11 @@ class HcTrip(models.Model):
             for income in rec.income_detail_ids:
                 customer_amount += income.amount
             for payment in rec.income_payment_detail_ids:
-                customer_payment += payment.amount
+                customer_payment += payment.payment_amount
             for cost in rec.cost_detail_ids:
                 transport_vendor_amount += cost.amount
             for cost_p in rec.cost_payment_detail_ids:
-                cost_payment += cost_p.amount
+                cost_payment += cost_p.payment_amount
             driver_salary_percent = 0
             if rec.vehicle_type_id:
                 driver_salary_percent = rec.vehicle_type_id.driver_salary_percent

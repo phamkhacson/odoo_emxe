@@ -108,6 +108,7 @@
                         <group>
                             <field name="name"/>
                             <field name="vat"/>
+                            <field name="cost_type_ids" widget="many2many_tags" options="{'no_open': True 'no_create': True}"/>
                             <field name="note"/>
                             <field name="sequence"/>
                             <field name="is_freight_cost"/>
@@ -147,6 +148,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="cost_type_ids" widget="many2many_tags" options="{'no_open': True 'no_create': True}"/>
                             <field name="note"/>
                             <field name="sequence"/>
                         </group>
@@ -185,6 +187,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="cost_type_ids" widget="many2many_tags" options="{'no_open': True 'no_create': True}"/>
                             <field name="note"/>
                             <field name="sequence"/>
                         </group>
@@ -223,6 +226,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="cost_type_ids" widget="many2many_tags" options="{'no_open': True 'no_create': True}"/>
                             <field name="note"/>
                             <field name="sequence"/>
                         </group>
@@ -261,6 +265,7 @@
                     <sheet>
                         <group>
                             <field name="name"/>
+                            <field name="cost_type_ids" widget="many2many_tags" options="{'no_open': True 'no_create': True}"/>
                             <field name="note"/>
                             <field name="sequence"/>
                         </group>
