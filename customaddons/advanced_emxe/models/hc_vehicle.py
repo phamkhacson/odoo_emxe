@@ -16,6 +16,7 @@ class HcVehicle(models.Model):
     state = fields.Selection([('available', 'Đang trống'), ('process', 'Đang trong chuyến')], string="Trạng thái", compute='_compute_process_data')
     process_trip_id = fields.Many2one('hc.trip', 'Chuyến đang xử lý', compute='_compute_process_data')
     fuel_consumption = fields.Float(string="Mức tiêu thụ (lít/100km)")
+    inspection_date = fields.Date(string="Hạn đăng kiểm")
     def _compute_process_data(self):
         for rec in self:
             trips = rec.env['hc.trip'].search([('vehicle_id', '=', rec.id), ('state', 'in', ['waiting', 'processing'])])

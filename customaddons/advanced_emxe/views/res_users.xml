@@ -18,13 +18,20 @@
                 <xpath expr="//page[@name='access_rights']" position="before">
                     <page name="hc_information" string="Thông tin">
                         <group>
-                            <field name="identification_number"/>
-                            <field name="phone" string="Điện thoại"/>
-                            <field name="position"/>
-                            <field name="emxe_gender" required="1"/>
-                            <field name="dealer_id"/>
-                            <field name="vehicle_ids" widget="many2many_tags"/>
-                            <field name="transport_vendor_id"/>
+                            <group string="Thông tin">
+                                <field name="identification_number"/>
+                                <field name="phone" string="Điện thoại"/>
+                                <field name="position"/>
+                                <field name="emxe_gender" required="1"/>
+                                <field name="dealer_id"/>
+                                <field name="vehicle_id"/>
+                                <field name="transport_vendor_id"/>
+                            </group>
+                            <group string="Bằng lái">
+                                <field name="lisense_number"/>
+                                <field name="lisense_type"/>
+                                <field name="lisense_date"/>
+                            </group>
                         </group>
                     </page>
                 </xpath>

@@ -1056,10 +1056,9 @@ class EMXEFlutterApi(http.Controller):
             })
             if method == 'cash':
                 cost_name = 'Lái xe thu tiền'
-                payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)], limit=1)
             else:
                 cost_name = 'Khách hàng thanh toán'
-                payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)], limit=1)
+            payment_income_id = request.env['hc.trip.entry.config'].search([('name', '=', cost_name)], limit=1)
             if not payment_income_id:
                 activity_id = request.env.ref('mail.mail_activity_data_todo').id
                 now = (datetime.now() + timedelta(hours=7)).strftime("%d/%m/%Y %H:%M:%S")

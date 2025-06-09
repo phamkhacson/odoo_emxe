@@ -13,3 +13,6 @@ class ResUsers(models.Model):
     emxe_gender = fields.Selection([
         ('male', 'Nam'), ('female', 'Nữ')], index=True,
         default='male', string='Giới tính')
+    lisense_number = fields.Char(string="Mã số GPLX")
+    lisense_type = fields.Char(string="Loại GPLX")
+    lisense_date = fields.Date(string="Ngày cấp GPLX")
