@@ -679,7 +679,7 @@
         <menuitem id="hc_trip_view_menu_root" name="Chuyến xe" parent="hc_data_menu_root" sequence="35"/>
         <menuitem id="hc_trip_view_menu" name="Điều chuyến lẻ" parent="hc_trip_view_menu_root" action="hc_trip_view_action" sequence="2"/>
         <menuitem id="inprogress_hc_trip_view_menu" name="Chuyến đang thực hiện" parent="hc_trip_view_menu_root" action="inprogress_hc_trip_view_action" sequence="3"/>
-        <menuitem id="payment_hc_trip_view_menu" name="Chuyến chờ chi phí" parent="hc_trip_view_menu_root" action="payment_hc_trip_view_action" sequence="4"/>
+        <menuitem id="payment_hc_trip_view_menu" name="Chuyến đã thực hiện" parent="hc_trip_view_menu_root" action="payment_hc_trip_view_action" sequence="4"/>
         <menuitem id="hc_trip_batch_view_menu" name="Điều chuyến gộp" parent="hc_trip_view_menu_root" action="hc_trip_batch_view_action" sequence="1"/>
         <record id="hc_trip_preview_view_tree" model="ir.ui.view">
             <field name="name">hc.trip.preview.view.tree</field>

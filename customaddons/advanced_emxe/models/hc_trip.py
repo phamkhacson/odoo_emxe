@@ -241,7 +241,7 @@ class HcTrip(models.Model):
     driver_paid_amount = fields.Float(string="Lái xe đã chi", compute='compute_amount_data', store=True)
     driver_prepaid_amount = fields.Float(string="Đã tạm ứng cho lái xe", compute='compute_amount_data', store=True)
     driver_balance = fields.Float(string="Số dư lái xe", compute='compute_amount_data', store=True)
-    need_pay_remain = fields.Float(string="Còn phải trả", compute='compute_amount_data', store=True)
+    need_pay_remain = fields.Float(string="Còn phải trả nhà cung cấp", compute='compute_amount_data', store=True)
     driver_receive_customer_amount = fields.Float(string="Lái xe đã thu", compute='compute_amount_data', store=True)
 
 
@@ -287,7 +287,7 @@ class HcTrip(models.Model):
             driver_salary_percent = 0
             if rec.vehicle_type_id:
                 driver_salary_percent = rec.vehicle_type_id.driver_salary_percent
-            rec.sudo().driver_receive_customer_amount = driver_paid_amount
+            rec.sudo().driver_receive_customer_amount = driver_receive_customer_amount
             rec.sudo().driver_paid_amount = driver_paid_amount
             rec.sudo().driver_prepaid_amount = driver_prepaid_amount
             rec.sudo().operation_cost_amount = operation_cost_amount
