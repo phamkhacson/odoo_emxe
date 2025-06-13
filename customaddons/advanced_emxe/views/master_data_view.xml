@@ -428,7 +428,7 @@
                                 <field name="remain_customer_amount" style="color: red"/>
                                 <field name="transport_vendor_amount"/>
 <!--                                <field name="hc_revenue"/>-->
-                                <field name="net_profit"/>
+<!--                                <field name="net_profit"/>-->
                                 <field name="operation_cost_amount" style="color: red"/>
                                 <field name="driver_receive_customer_amount"/>
                                 <field name="need_pay_remain"/>
@@ -622,18 +622,19 @@
                     <field name="destination"/>
                     <filter string="Chưa điều xe" name="unassigned_vehicle" domain=" [('vehicle_id','=',False)]"/>
                     <filter string="Nhà xe Hoàng Châu" name="hc_trip" domain=" [('transport_vendor_id','=',1)]"/>
-                    <filter string="Tháng 1" name="january" domain="[('create_date','&lt;=',context_today().strftime('%Y-01-31')),('create_date','>=',context_today().strftime('%Y-01-01'))]"/>
-                    <filter string="Tháng 2" name="february" domain="[('create_date','&lt;=',context_today().strftime('%Y-02-29')),('create_date','>=',context_today().strftime('%Y-02-01'))]"/>
-                    <filter string="Tháng 3" name="march" domain="[('create_date','&lt;=',context_today().strftime('%Y-03-31')),('create_date','>=',context_today().strftime('%Y-03-01'))]"/>
-                    <filter string="Tháng 4" name="april" domain="[('create_date','&lt;=',context_today().strftime('%Y-04-30')),('create_date','>=',context_today().strftime('%Y-04-01'))]"/>
-                    <filter string="Tháng 5" name="may" domain="[('create_date','&lt;=',context_today().strftime('%Y-05-31')),('create_date','>=',context_today().strftime('%Y-05-01'))]"/>
-                    <filter string="Tháng 6" name="june" domain="[('create_date','&lt;=',context_today().strftime('%Y-06-30')),('create_date','>=',context_today().strftime('%Y-06-01'))]"/>
-                    <filter string="Tháng 7" name="july" domain="[('create_date','&lt;=',context_today().strftime('%Y-07-31')),('create_date','>=',context_today().strftime('%Y-07-01'))]"/>
-                    <filter string="Tháng 8" name="august" domain="[('create_date','&lt;=',context_today().strftime('%Y-08-31')),('create_date','>=',context_today().strftime('%Y-08-01'))]"/>
-                    <filter string="Tháng 9" name="september" domain="[('create_date','&lt;=',context_today().strftime('%Y-09-30')),('create_date','>=',context_today().strftime('%Y-09-01'))]"/>
-                    <filter string="Tháng 10" name="october" domain="[('create_date','&lt;=',context_today().strftime('%Y-10-31')),('create_date','>=',context_today().strftime('%Y-10-01'))]"/>
-                    <filter string="Tháng 11" name="november" domain="[('create_date','&lt;=',context_today().strftime('%Y-11-30')),('create_date','>=',context_today().strftime('%Y-11-01'))]"/>
-                    <filter string="Tháng 12" name="december" domain="[('create_date','&lt;=',context_today().strftime('%Y-12-31')),('create_date','>=',context_today().strftime('%Y-12-01'))]"/>
+                    <filter string="Ngày khởi hành" name="filter_start_date" date="start_time"/>
+                    <filter string="Tháng 1" name="january" domain="[('start_time','&lt;=',context_today().strftime('%Y-01-31')),('start_time','>=',context_today().strftime('%Y-01-01'))]"/>
+                    <filter string="Tháng 2" name="february" domain="[('start_time','&lt;=',context_today().strftime('%Y-02-28')),('start_time','>=',context_today().strftime('%Y-02-01'))]"/>
+                    <filter string="Tháng 3" name="march" domain="[('start_time','&lt;=',context_today().strftime('%Y-03-31')),('start_time','>=',context_today().strftime('%Y-03-01'))]"/>
+                    <filter string="Tháng 4" name="april" domain="[('start_time','&lt;=',context_today().strftime('%Y-04-30')),('start_time','>=',context_today().strftime('%Y-04-01'))]"/>
+                    <filter string="Tháng 5" name="may" domain="[('start_time','&lt;=',context_today().strftime('%Y-05-31')),('start_time','>=',context_today().strftime('%Y-05-01'))]"/>
+                    <filter string="Tháng 6" name="june" domain="[('start_time','&lt;=',context_today().strftime('%Y-06-30')),('start_time','>=',context_today().strftime('%Y-06-01'))]"/>
+                    <filter string="Tháng 7" name="july" domain="[('start_time','&lt;=',context_today().strftime('%Y-07-31')),('start_time','>=',context_today().strftime('%Y-07-01'))]"/>
+                    <filter string="Tháng 8" name="august" domain="[('start_time','&lt;=',context_today().strftime('%Y-08-31')),('start_time','>=',context_today().strftime('%Y-08-01'))]"/>
+                    <filter string="Tháng 9" name="september" domain="[('start_time','&lt;=',context_today().strftime('%Y-09-30')),('start_time','>=',context_today().strftime('%Y-09-01'))]"/>
+                    <filter string="Tháng 10" name="october" domain="[('start_time','&lt;=',context_today().strftime('%Y-10-31')),('start_time','>=',context_today().strftime('%Y-10-01'))]"/>
+                    <filter string="Tháng 11" name="november" domain="[('start_time','&lt;=',context_today().strftime('%Y-11-30')),('start_time','>=',context_today().strftime('%Y-11-01'))]"/>
+                    <filter string="Tháng 12" name="december" domain="[('start_time','&lt;=',context_today().strftime('%Y-12-31')),('start_time','>=',context_today().strftime('%Y-12-01'))]"/>
                     <separator/>
                     <group expand="0" string="Group By">
                         <filter string="Đại lý" name="group_by_dealer" domain="" context="{'group_by':'dealer_id'}"/>

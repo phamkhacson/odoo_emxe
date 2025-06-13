@@ -53,7 +53,7 @@ class HcTrip(models.Model):
     state = fields.Selection([('draft', 'Khai báo chuyến'), ('waiting', 'Chờ khởi hành'), ('processing', 'Đang thực hiện'), ('payment', 'Chờ chi phí'), ('done', 'Đã hoàn thành'), ('cancel', 'Hủy')], string="Trạng thái", default='draft')
     customer_amount = fields.Float(string="Tiền thu từ khách hàng", compute='compute_amount_data', store=True)
     remain_customer_amount = fields.Float(string="Còn phải thu", compute='compute_amount_data', store=True)
-    transport_vendor_amount = fields.Float(string="Doanh thu tính lương", compute='compute_amount_data', store=True)
+    transport_vendor_amount = fields.Float(string="Giá giao cho nhà xe", compute='compute_amount_data', store=True)
     cost_payment = fields.Float(string="Đã thanh toán cho nhà xe", compute='compute_amount_data', store=True)
     oil_cost = fields.Float(string="Chi phí dầu")
     other_cost = fields.Float(string="Chi phí khác", compute="compute_hc_cost", store=True)
@@ -258,6 +258,7 @@ class HcTrip(models.Model):
             driver_paid_amount = 0
             driver_prepaid_amount = 0
             driver_receive_customer_amount = 0
+            driver_paid_amount_exclude_tip = 0
             payment_driver_advance_id = self.env['hc.trip.entry.config'].search(
                 [('name', '=', 'Tạm ứng cho lái xe')], limit=1)
             if payment_driver_advance_id:
@@ -269,6 +270,8 @@ class HcTrip(models.Model):
                 driver_receive_customer_amount = sum(rec.income_payment_detail_ids.filtered(
                     lambda x: x.payment_income_id == payment_driver_receive_id).mapped('payment_amount'))
             for driver_cost_id in rec.driver_cost_ids:
+                if driver_cost_id.driver_cost_id.name != "Tip":
+                    driver_paid_amount_exclude_tip += driver_cost_id.payment_amount
                 driver_paid_amount += driver_cost_id.payment_amount
             for oc in rec.operation_cost_ids:
                 if oc.operation_cost_id and oc.operation_cost_id.name and not 'Cao tốc' in oc.operation_cost_id.name:
@@ -297,7 +300,7 @@ class HcTrip(models.Model):
             rec.sudo().transport_vendor_amount = transport_vendor_amount
             rec.sudo().hc_revenue = customer_amount - transport_vendor_amount
             rec.sudo().net_profit = customer_amount - transport_vendor_amount - commission_fee
-            rec.sudo().driver_salary = (transport_vendor_amount - operation_cost_amount_exclude_oil) * driver_salary_percent/100
+            rec.sudo().driver_salary = (transport_vendor_amount - driver_paid_amount_exclude_tip) * driver_salary_percent/100
             rec.sudo().driver_balance = rec.sudo().driver_salary + driver_paid_amount - driver_prepaid_amount
             rec.sudo().need_pay_remain = rec.sudo().transport_vendor_amount - driver_receive_customer_amount + operation_cost_amount - cost_payment
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields
+from odoo import models, fields, api
 from odoo.tools.populate import compute
 
 
@@ -37,6 +37,7 @@ class HcTripAmountDetail(models.Model):
         for rec in self:
             rec.sequence = rec.income_id.sequence if rec.income_id else rec.payment_income_id.sequence if rec.payment_income_id else rec.cost_id.sequence if rec.cost_id else rec.paid_cost_id.sequence if rec.paid_cost_id else rec.operation_cost_id.sequence if rec.operation_cost_id else rec.driver_cost_id.sequence if rec.driver_cost_id else 99
 
+    @api.depends('price', 'qty')
     def _compute_amount(self):
         for rec in self:
             rec.sudo().amount = rec.price * rec.qty
